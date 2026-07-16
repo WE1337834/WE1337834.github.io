@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка портфолио</title>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <header>
+        <h1>Админка портфолио</h1>
+        <nav>
+            <a href="index.html">На сайт</a>
+            <button id="logout-btn">Выйти</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Форма входа -->
+        <div id="login-form">
+            <h2>Вход в админку</h2>
+            <form>
+                <input type="password" id="admin-password" placeholder="Введите пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+
+        <!-- Админ-панель -->
+        <div id="admin-panel" style="display: none;">
+            <h2>Управление проектами</h2>
+            
+            <!-- Форма добавления/редактирования -->
+            <form id="project-form">
+                <input type="text" id="title" placeholder="Название проекта" required>
+                <textarea id="description" placeholder="Описание"></textarea>
+                <input type="text" id="technologies" placeholder="Технологии (через запятую)">
+                <input type="url" id="github_link" placeholder="Ссылка на GitHub">
+                <input type="url" id="demo_link" placeholder="Ссылка на демо">
+                <button type="submit">Добавить проект</button>
+                <button type="button" onclick="resetForm()">Очистить</button>
+            </form>
+
+            <!-- Список проектов -->
+            <h3>Существующие проекты</h3>
+            <div id="projects-list"></div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>
