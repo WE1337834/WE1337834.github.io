@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка портфолио</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>Управление проектами</h1>
+            <nav>
+                <a href="index.html" class="back-link">← На сайт</a>
+                <button id="logout-btn" style="display: none;">Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div id="login-form" class="auth-card">
+            <h2>Доступ к админке</h2>
+            <p>Введите пароль администратора</p>
+            <form>
+                <input type="password" id="admin-password" placeholder="Пароль" required>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+        </div>
+
+        <div id="admin-panel" style="display: none;">
+            <div class="admin-grid">
+                <div class="form-container">
+                    <h2 id="form-action-title">Добавить новый проект</h2>
+                    <form id="project-form">
+                        <div class="input-group">
+                            <label for="title">Название проекта</label>
+                            <input type="text" id="title" placeholder="Например: Интернет-магазин" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="description">Описание проекта</label>
+                            <textarea id="description" placeholder="Краткое описание функционала и задач..." rows="4"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="technologies">Используемые технологии</label>
+                            <input type="text" id="technologies" placeholder="React, Node.js, Supabase (через запятую)">
+                        </div>
+                        <div class="input-group">
+                            <label for="github_link">Ссылка на GitHub</label>
+                            <input type="url" id="github_link" placeholder="https://github.com/...">
+                        </div>
+                        <div class="input-group">
+                            <label for="demo_link">Ссылка на Демо</label>
+                            <input type="url" id="demo_link" placeholder="https://...">
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary">Добавить проект</button>
+                            <button type="button" onclick="resetForm()" class="btn btn-secondary">Очистить</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="list-container">
+                    <h2>Существующие проекты</h2>
+                    <div id="projects-list">
+                        <p class="empty-msg">Проектов пока нет</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>
