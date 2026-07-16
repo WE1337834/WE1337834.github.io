@@ -8,13 +8,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-style.css">
-    <!-- Подключаем EasyMDE для Markdown -->
+    <!-- EasyMDE для Markdown -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 </head>
 <body>
 
-    <!-- Модалка входа -->
+    <!-- ===== МОДАЛКА ВХОДА ===== -->
     <div id="login-overlay" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-icon">🔐</div>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <!-- Основная панель -->
+    <!-- ===== ОСНОВНАЯ ПАНЕЛЬ ===== -->
     <div id="admin-panel" style="display: none;" class="admin-container">
         
         <!-- Хедер -->
@@ -46,14 +46,13 @@
         <!-- Вкладки -->
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
+            <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
             <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
             <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
-            <button class="tab-btn" data-tab="translations">🌍 Переводы</button>
         </div>
 
         <!-- ===== ВКЛАДКА: ПРОЕКТЫ ===== -->
         <div id="tab-projects" class="tab-content active">
-            <!-- Форма -->
             <div class="admin-card">
                 <div class="admin-card-header">
                     <h2 id="form-action-title">➕ Добавить проект</h2>
@@ -116,7 +115,6 @@
                 </form>
             </div>
 
-            <!-- Список проектов -->
             <div class="admin-card">
                 <div class="admin-card-header">
                     <h2>📋 Все проекты</h2>
@@ -124,6 +122,19 @@
                 </div>
                 <div id="projects-list" class="projects-list">
                     <div class="empty-state"><p>😕 Нет проектов</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ВКЛАДКА: АНАЛИТИКА ===== -->
+        <div id="tab-analytics" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📊 Аналитика просмотров</h2>
+                    <span class="card-badge">Статистика</span>
+                </div>
+                <div id="analytics-container" class="analytics-container">
+                    <div class="empty-state"><p>⏳ Загрузка данных...</p></div>
                 </div>
             </div>
         </div>
@@ -205,7 +216,6 @@
                 </form>
             </div>
 
-            <!-- Кнопка тестового уведомления -->
             <div class="admin-card">
                 <div class="admin-card-header">
                     <h2>📨 Тестовое уведомление</h2>
@@ -213,19 +223,6 @@
                 <div style="padding: 20px 28px;">
                     <button onclick="sendTestNotification()" class="btn btn-primary">📨 Отправить тестовое уведомление</button>
                     <div id="notification-status" class="form-status" style="margin-top: 12px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== ВКЛАДКА: ПЕРЕВОДЫ ===== -->
-        <div id="tab-translations" class="tab-content">
-            <div class="admin-card">
-                <div class="admin-card-header">
-                    <h2>🌍 Управление переводами</h2>
-                    <button onclick="addTranslationRow()" class="btn btn-primary" style="padding: 6px 16px; font-size: 13px;">➕ Добавить</button>
-                </div>
-                <div id="translations-list" class="translations-list">
-                    <div class="empty-state"><p>Загрузка переводов...</p></div>
                 </div>
             </div>
         </div>

@@ -19,7 +19,6 @@ function checkAuth() {
         loadProjects();
         loadContacts();
         loadSettings();
-        loadTranslations();
         initMarkdownEditor();
     } else {
         if (loginOverlay) loginOverlay.style.display = 'flex';
@@ -58,17 +57,22 @@ function initTabs() {
         projects: document.getElementById('tab-projects'),
         contacts: document.getElementById('tab-contacts'),
         settings: document.getElementById('tab-settings'),
-        translations: document.getElementById('tab-translations')
+        analytics: document.getElementById('tab-analytics')
     };
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             tabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            Object.values(contents).forEach(c => c.classList.remove('active'));
+            Object.values(contents).forEach(c => {
+                if (c) c.classList.remove('active');
+            });
             const tabName = this.dataset.tab;
             if (contents[tabName]) {
                 contents[tabName].classList.add('active');
+                if (tabName === 'analytics') {
+                    loadAnalytics();
+                }
             }
         });
     });
@@ -99,25 +103,8 @@ function initMarkdownEditor() {
         renderingConfig: {
             singleLineBreaks: false,
             codeSyntaxHighlighting: true,
-        },
-        previewRender: function(plainText) {
-            return renderMarkdownPreview(plainText);
         }
     });
-}
-
-function renderMarkdownPreview(text) {
-    if (!text) return '';
-    return text
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        .replace(/^\s*-\s(.*$)/gim, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-        .replace(/\n/g, '<br>');
 }
 
 // ============================================
@@ -163,8 +150,9 @@ async function loadProjects() {
                             `<span>${escapeHtml(tag)}</span>`
                         ).join('') : '<span>Нет тегов</span>'}
                     </div>
-                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
-                        👁️ ${project.views || 0} · ❤️ ${project.likes || 0}
+                    <div style="display:flex; gap:16px; margin-top:8px; font-size:0.85rem; color:var(--text-muted);">
+                        <span>👁️ Просмотров: <strong style="color:var(--text-main);">${project.views || 0}</strong></span>
+                        <span>📅 Создан: ${new Date(project.created_at).toLocaleDateString('ru-RU')}</span>
                     </div>
                 </div>
                 <div class="project-actions">
@@ -184,10 +172,8 @@ async function saveProject(event) {
     event.preventDefault();
     
     const form = document.getElementById('project-form');
-    const statusEl = document.getElementById('form-status');
     const submitBtn = form.querySelector('button[type="submit"]');
     
-    // Получаем теги
     const tagsInput = document.getElementById('tags').value;
     const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
@@ -211,18 +197,23 @@ async function saveProject(event) {
         submitBtn.disabled = true;
         submitBtn.textContent = editingId ? '⏳ Обновление...' : '⏳ Сохранение...';
 
-        // Загрузка изображения, если выбрано
         const fileInput = document.getElementById('image_file');
         if (fileInput && fileInput.files.length > 0) {
             const file = fileInput.files[0];
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}.${fileExt}`;
             
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+            const { error: uploadError } = await supabaseClient.storage
                 .from('project-images')
                 .upload(fileName, file);
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                console.error('Ошибка загрузки изображения:', uploadError);
+                showStatus('⚠️ Ошибка загрузки изображения: ' + uploadError.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = editingId ? '💾 Обновить' : '💾 Сохранить';
+                return;
+            }
 
             const { data: urlData } = supabaseClient.storage
                 .from('project-images')
@@ -245,12 +236,7 @@ async function saveProject(event) {
 
         if (result.error) throw result.error;
 
-        showStatus(
-            editingId ? '✅ Проект обновлён!' : '✅ Проект добавлен!',
-            'success'
-        );
-
-        // Отправляем уведомление в Telegram
+        showStatus(editingId ? '✅ Проект обновлён!' : '✅ Проект добавлен!', 'success');
         await sendTelegramNotification(projectData, editingId ? 'update' : 'create');
 
         resetForm();
@@ -364,7 +350,6 @@ async function loadContacts() {
 async function saveContacts(event) {
     event.preventDefault();
     
-    const statusEl = document.getElementById('contacts-status');
     const submitBtn = document.querySelector('#contacts-form button[type="submit"]');
 
     const contactsData = {
@@ -439,7 +424,6 @@ async function loadSettings() {
 async function saveSettings(event) {
     event.preventDefault();
     
-    const statusEl = document.getElementById('settings-status');
     const submitBtn = document.querySelector('#settings-form button[type="submit"]');
 
     const settingsData = {
@@ -518,7 +502,7 @@ ${tagsText}
 🔗 ${siteUrl}
         `.trim();
 
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -528,11 +512,6 @@ ${tagsText}
                 disable_web_page_preview: false
             })
         });
-
-        const result = await response.json();
-        if (!result.ok) {
-            console.error('Telegram API error:', result);
-        }
 
     } catch (error) {
         console.error('Ошибка отправки уведомления:', error);
@@ -581,101 +560,90 @@ async function sendTestNotification() {
 }
 
 // ============================================
-//  ПЕРЕВОДЫ (i18n)
+//  АНАЛИТИКА
 // ============================================
 
-async function loadTranslations() {
-    const container = document.getElementById('translations-list');
+async function loadAnalytics() {
+    const container = document.getElementById('analytics-container');
     if (!container) return;
 
     try {
-        const { data: translations, error } = await supabaseClient
-            .from('translations')
-            .select('*')
-            .order('key');
+        const { data: projects, error } = await supabaseClient
+            .from('projects')
+            .select('id, title, views, created_at, status')
+            .order('views', { ascending: false });
 
         if (error) throw error;
 
-        if (!translations || translations.length === 0) {
-            container.innerHTML = `<div class="empty-state"><p>🌍 Нет переводов</p></div>`;
+        if (!projects || projects.length === 0) {
+            container.innerHTML = `<div class="empty-state"><p>📊 Нет данных для аналитики</p></div>`;
             return;
         }
 
-        container.innerHTML = translations.map(t => `
-            <div class="translation-item" data-id="${t.id}">
-                <span class="trans-key">${escapeHtml(t.key)}</span>
-                <input type="text" class="trans-ru" value="${escapeHtml(t.ru || '')}" placeholder="Русский">
-                <input type="text" class="trans-en" value="${escapeHtml(t.en || '')}" placeholder="English">
-                <div class="trans-actions">
-                    <button class="btn-save" onclick="saveTranslation(${t.id}, this)">💾</button>
-                    <button class="btn-delete" onclick="deleteTranslation(${t.id})">🗑️</button>
+        const totalViews = projects.reduce((sum, p) => sum + (p.views || 0), 0);
+        const totalProjects = projects.length;
+        const publishedProjects = projects.filter(p => p.status === 'published').length;
+
+        let html = `
+            <div class="analytics-stats">
+                <div class="analytics-stat-card">
+                    <span class="stat-number">${totalViews}</span>
+                    <span class="stat-label">👁️ Всего просмотров</span>
+                </div>
+                <div class="analytics-stat-card">
+                    <span class="stat-number">${totalProjects}</span>
+                    <span class="stat-label">📁 Всего проектов</span>
+                </div>
+                <div class="analytics-stat-card">
+                    <span class="stat-number">${publishedProjects}</span>
+                    <span class="stat-label">✅ Опубликовано</span>
+                </div>
+                <div class="analytics-stat-card">
+                    <span class="stat-number">${totalProjects > 0 ? Math.round(totalViews / totalProjects) : 0}</span>
+                    <span class="stat-label">📊 Среднее просмотров</span>
                 </div>
             </div>
-        `).join('');
+            <div class="analytics-table-wrapper">
+                <table class="analytics-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Название</th>
+                            <th>Статус</th>
+                            <th>👁️ Просмотры</th>
+                            <th>📅 Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        projects.forEach((project, index) => {
+            const statusIcon = project.status === 'published' ? '✅' : 
+                              project.status === 'draft' ? '🔄' : '📦';
+            const statusLabel = project.status || 'published';
+            
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${escapeHtml(project.title)}</strong></td>
+                    <td><span class="status-badge ${statusLabel}">${statusIcon} ${statusLabel}</span></td>
+                    <td><span class="views-count">${project.views || 0}</span></td>
+                    <td>${new Date(project.created_at).toLocaleDateString('ru-RU')}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = html;
 
     } catch (error) {
-        console.error('Ошибка загрузки переводов:', error);
-        container.innerHTML = `<div class="empty-state"><p>⚠️ ${error.message}</p></div>`;
-    }
-}
-
-async function saveTranslation(id, btn) {
-    const item = btn.closest('.translation-item');
-    const ru = item.querySelector('.trans-ru').value.trim();
-    const en = item.querySelector('.trans-en').value.trim();
-
-    try {
-        btn.textContent = '⏳';
-        const { error } = await supabaseClient
-            .from('translations')
-            .update({ ru, en, updated_at: new Date().toISOString() })
-            .eq('id', id);
-
-        if (error) throw error;
-
-        btn.textContent = '✅';
-        setTimeout(() => { btn.textContent = '💾'; }, 1500);
-
-    } catch (error) {
-        console.error('Ошибка сохранения:', error);
-        btn.textContent = '❌';
-        setTimeout(() => { btn.textContent = '💾'; }, 1500);
-    }
-}
-
-async function deleteTranslation(id) {
-    if (!confirm('Удалить этот перевод?')) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('translations')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-        loadTranslations();
-
-    } catch (error) {
-        console.error('Ошибка удаления:', error);
-        alert('Ошибка: ' + error.message);
-    }
-}
-
-async function addTranslationRow() {
-    try {
-        const key = prompt('Введите ключ перевода (например: hello_world):');
-        if (!key || !key.trim()) return;
-
-        const { error } = await supabaseClient
-            .from('translations')
-            .insert([{ key: key.trim(), ru: '', en: '' }]);
-
-        if (error) throw error;
-        loadTranslations();
-
-    } catch (error) {
-        console.error('Ошибка добавления:', error);
-        alert('Ошибка: ' + error.message);
+        console.error('Ошибка загрузки аналитики:', error);
+        container.innerHTML = `<div class="empty-state"><p>⚠️ Ошибка: ${error.message}</p></div>`;
     }
 }
 
@@ -704,7 +672,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Lightbox для админки
 function openLightbox(imageUrl) {
     const lightbox = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
@@ -726,25 +693,11 @@ function closeLightbox() {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Логин
     document.getElementById('login-form')?.addEventListener('submit', login);
     document.getElementById('logout-btn')?.addEventListener('click', logout);
-    
-    // Проекты
     document.getElementById('project-form')?.addEventListener('submit', saveProject);
-    
-    // Контакты
     document.getElementById('contacts-form')?.addEventListener('submit', saveContacts);
-    
-    // Настройки
     document.getElementById('settings-form')?.addEventListener('submit', saveSettings);
-    
-    // Вкладки
     initTabs();
-    
-    // Проверка авторизации
     checkAuth();
-
-    // Закрытие лайтбокса
-    document.getElementById('lightbox')?.addEventListener('click', closeLightbox);
 });

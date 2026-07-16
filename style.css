@@ -1,5 +1,4 @@
 :root {
-    /* Apple палитра */
     --bg-color: #F5F5F7;
     --text-main: #1D1D1F;
     --text-muted: #86868B;
@@ -8,6 +7,8 @@
     --card-bg: #FFFFFF;
     --card-border: rgba(0, 0, 0, 0.05);
     --glass-bg: rgba(255, 255, 255, 0.72);
+    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
+    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 * {
@@ -25,7 +26,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Навигация (Glassmorphism) */
+/* ===== НАВИГАЦИЯ ===== */
 .glass-nav {
     position: fixed;
     top: 0;
@@ -33,7 +34,6 @@ body {
     width: 100%;
     background: var(--glass-bg);
     backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--card-border);
     z-index: 1000;
 }
@@ -81,7 +81,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Главный экран */
+/* ===== HERO ===== */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -100,9 +100,16 @@ body {
     letter-spacing: -0.04em;
     line-height: 1.05;
     margin-bottom: 24px;
-    background: linear-gradient(135deg, #1D1D1F 0%, #434353 100%);
+    background: linear-gradient(135deg, #1D1D1F 0%, #434353 50%, #0066CC 100%);
+    background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: gradientMove 6s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 .hero-subtitle {
@@ -125,7 +132,6 @@ body {
     border-radius: 50%;
 }
 
-/* Кнопки */
 .hero-actions {
     display: flex;
     gap: 16px;
@@ -133,6 +139,7 @@ body {
     flex-wrap: wrap;
 }
 
+/* ===== КНОПКИ ===== */
 .btn {
     padding: 14px 28px;
     border-radius: 30px;
@@ -165,7 +172,7 @@ body {
     background-color: #E8E8ED;
 }
 
-/* Bento Grid Секция */
+/* ===== BENTO GRID ===== */
 .bento-section {
     max-width: 1200px;
     margin: 0 auto;
@@ -196,9 +203,7 @@ body {
     gap: 24px;
 }
 
-/* ============================================
-   КАРТОЧКИ ПРОЕКТОВ (динамические)
-   ============================================ */
+/* ===== КАРТОЧКИ ===== */
 .bento-card {
     background-color: var(--card-bg);
     border-radius: 32px;
@@ -226,7 +231,6 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
 
-/* Размеры карточек */
 .bento-large {
     grid-column: span 2;
     grid-row: span 2;
@@ -243,7 +247,6 @@ body {
     grid-row: span 1;
 }
 
-/* Тёмная карточка */
 .bento-card.dark-card {
     background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
     color: #F5F5F7;
@@ -262,7 +265,7 @@ body {
     color: #F5F5F7;
 }
 
-/* Содержимое карточки */
+/* ===== СОДЕРЖИМОЕ КАРТОЧКИ ===== */
 .card-label {
     font-size: 0.75rem;
     font-weight: 600;
@@ -289,441 +292,13 @@ body {
     margin-bottom: 16px;
 }
 
-/* Технологии (теги) */
-.tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: auto;
-}
-
-.tech-tag {
-    background: rgba(0, 102, 204, 0.06);
-    color: var(--accent-blue);
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-/* Ссылки на проекты */
-.project-links {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--card-border);
-}
-
-.project-links a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: color 0.2s ease;
-}
-
-.project-links a:hover {
-    color: var(--accent-hover);
-    text-decoration: underline;
-}
-
-/* Загрузка */
-.loading-projects {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 0;
-    color: var(--text-muted);
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--card-border);
-    border-top-color: var(--accent-blue);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Пустое состояние */
-.empty-projects {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 0;
-}
-
-.empty-projects p {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-}
-
-.empty-projects a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.empty-projects a:hover {
-    text-decoration: underline;
-}
-
-/* ============================================
-   КОНТАКТЫ
-   ============================================ */
-.contact-section {
-    padding: 80px 24px;
-}
-
-.contact-box {
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--card-bg);
-    padding: 60px;
-    border-radius: 32px;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-}
-
-.contact-box h2 {
-    font-size: 2.2rem;
-    letter-spacing: -0.02em;
-    margin-bottom: 12px;
-}
-
-.contact-box p {
-    color: var(--text-muted);
-    margin-bottom: 32px;
-}
-
-.apple-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.apple-form input {
-    width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid #D2D2D7;
-    background: #F5F5F7;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.2s ease;
-}
-
-.apple-form input:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-    background: #FFF;
-    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
-}
-
-/* ============================================
-   ФУТЕР
-   ============================================ */
-footer {
-    padding: 40px 24px;
-    border-top: 1px solid var(--card-border);
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.footer-links {
-    display: flex;
-    gap: 20px;
-}
-
-.footer-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-}
-
-.footer-links a:hover {
-    color: var(--text-main);
-}
-
-/* ============================================
-   АНИМАЦИЯ ПОЯВЛЕНИЯ
-   ============================================ */
-.fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
-                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.fade-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ============================================
-   АДАПТИВНОСТЬ
-   ============================================ */
-@media (max-width: 1024px) {
-    .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .bento-large {
-        grid-column: span 2;
-        grid-row: span 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .bento-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .bento-large,
-    .bento-medium,
-    .bento-small {
-        grid-column: span 1;
-        grid-row: auto;
-    }
-    
-    .hero-title {
-        font-size: 2.8rem;
-    }
-    
-    .contact-box {
-        padding: 40px 24px;
-    }
-    
-    .section-header h2 {
-        font-size: 2.2rem;
-    }
-    
-    .nav-links a:not(.nav-btn) {
-        display: none;
-    }
-}
-
-@media (max-width: 480px) {
-    .bento-card {
-        padding: 24px 20px;
-    }
-    
-    .bento-card h3 {
-        font-size: 1.4rem;
-    }
-    
-    .hero-title {
-        font-size: 2.2rem;
-    }
-    
-    .btn {
-        padding: 12px 20px;
-        font-size: 0.9rem;
-    }
-}
-/* ============================================
-   КОНТАКТЫ НА САЙТЕ
-   ============================================ */
-.contacts-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin: 20px 0 24px;
-}
-
-.contact-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    background: var(--bg-primary);
-    border-radius: 100px;
-    border: 1px solid var(--card-border);
-    transition: all var(--transition);
-    text-decoration: none;
-    color: var(--text-main);
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.contact-chip:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
-}
-
-.contact-chip .chip-icon {
-    font-size: 18px;
-}
-
-.contact-divider {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin: 8px 0 16px;
-    position: relative;
-}
-
-.contact-divider::before,
-.contact-divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 30%;
-    height: 1px;
-    background: var(--card-border);
-}
-
-.contact-divider::before {
-    left: 0;
-}
-
-.contact-divider::after {
-    right: 0;
-}
-
-/* Пустое состояние контактов */
-.contacts-empty {
-    color: var(--text-muted);
-    font-size: 14px;
-    padding: 12px;
-}
-
-/* ============================================
-   АДАПТИВНОСТЬ КОНТАКТОВ
-   ============================================ */
-@media (max-width: 480px) {
-    .contact-chip {
-        padding: 10px 16px;
-        font-size: 13px;
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .contact-divider::before,
-    .contact-divider::after {
-        width: 20%;
-    }
-}
-/* ============================================
-   КОНТРОЛЫ (Фильтр, Поиск, Сортировка)
-   ============================================ */
-.controls-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 32px;
-    align-items: center;
-    justify-content: center;
-}
-
-.controls-bar .search-box {
-    flex: 1;
-    min-width: 200px;
-    max-width: 400px;
-    position: relative;
-}
-
-.controls-bar .search-box input {
-    width: 100%;
-    padding: 12px 16px 12px 44px;
-    border-radius: 100px;
-    border: 2px solid var(--card-border);
-    background: var(--bg-secondary);
-    font-size: 0.95rem;
-    font-family: inherit;
-    transition: all var(--transition);
-    outline: none;
-}
-
-.controls-bar .search-box input:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.08);
-}
-
-.controls-bar .search-box .search-icon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 18px;
-}
-
-.controls-bar select {
-    padding: 12px 16px;
-    border-radius: 100px;
-    border: 2px solid var(--card-border);
-    background: var(--bg-secondary);
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-    outline: none;
-    transition: all var(--transition);
-    min-width: 140px;
-}
-
-.controls-bar select:focus {
-    border-color: var(--accent-blue);
-}
-
-/* Фильтры технологий */
-.filter-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 32px;
-}
-
-.filter-tag {
-    padding: 8px 20px;
-    border-radius: 100px;
-    border: 2px solid var(--card-border);
-    background: transparent;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition);
-    color: var(--text-secondary);
-}
-
-.filter-tag:hover {
-    border-color: var(--accent-blue);
-    color: var(--text-main);
-}
-
-.filter-tag.active {
-    background: var(--accent-blue);
-    color: white;
-    border-color: var(--accent-blue);
-}
-
-/* ============================================
-   КАРТОЧКА ПРОЕКТА (расширенная)
-   ============================================ */
 .bento-card .project-image {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: 16px;
     margin-bottom: 16px;
-    background: var(--bg-primary);
+    background: var(--bg-color);
     transition: transform 0.4s ease;
 }
 
@@ -757,6 +332,22 @@ footer {
     color: #8e8e93;
 }
 
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.tech-tag {
+    background: rgba(0, 102, 204, 0.06);
+    color: var(--accent-blue);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
 .bento-card .project-meta {
     display: flex;
     align-items: center;
@@ -774,58 +365,109 @@ footer {
     gap: 4px;
 }
 
-.bento-card .project-meta .like-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-    padding: 4px 8px;
-    border-radius: 8px;
+.bento-card .project-meta a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-.bento-card .project-meta .like-btn:hover {
-    transform: scale(1.2);
+.bento-card .project-meta a:hover {
+    color: var(--accent-blue);
 }
 
-.bento-card .project-meta .like-btn.liked {
-    color: #ff3b30;
+/* ===== КОНТРОЛЫ ===== */
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+    align-items: center;
+    justify-content: center;
 }
 
-/* ============================================
-   МАРКДАУН В КАРТОЧКАХ
-   ============================================ */
-.bento-card .markdown-body {
+.controls-bar .search-box {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+    position: relative;
+}
+
+.controls-bar .search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border-radius: 100px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
     font-size: 0.95rem;
-    line-height: 1.7;
+    font-family: inherit;
+    transition: all var(--transition);
+    outline: none;
+}
+
+.controls-bar .search-box input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.08);
+}
+
+.controls-bar .search-box .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 18px;
+}
+
+.controls-bar select {
+    padding: 12px 16px;
+    border-radius: 100px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: all var(--transition);
+    min-width: 140px;
+}
+
+.controls-bar select:focus {
+    border-color: var(--accent-blue);
+}
+
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.filter-tag {
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 2px solid var(--card-border);
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
     color: var(--text-secondary);
 }
 
-.bento-card .markdown-body h1,
-.bento-card .markdown-body h2,
-.bento-card .markdown-body h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 8px 0 4px;
+.filter-tag:hover {
+    border-color: var(--accent-blue);
     color: var(--text-main);
 }
 
-.bento-card .markdown-body ul,
-.bento-card .markdown-body ol {
-    padding-left: 20px;
-    margin: 4px 0 8px;
+.filter-tag.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
 }
 
-.bento-card .markdown-body code {
-    background: var(--bg-primary);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-}
-
-/* ============================================
-   СТАТИСТИКА ПРОЕКТОВ
-   ============================================ */
+/* ===== СТАТИСТИКА ===== */
 .project-stats {
     display: flex;
     gap: 24px;
@@ -848,9 +490,151 @@ footer {
     color: var(--text-muted);
 }
 
-/* ============================================
-   LIGHTBOX ДЛЯ ИЗОБРАЖЕНИЙ
-   ============================================ */
+/* ===== КОНТАКТЫ ===== */
+.contact-section {
+    padding: 80px 24px;
+}
+
+.contact-box {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    padding: 60px;
+    border-radius: 32px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    border: 1px solid var(--card-border);
+}
+
+.contact-box h2 {
+    font-size: 2.2rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+}
+
+.contact-box p {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.contacts-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0 24px;
+}
+
+.contact-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--bg-color);
+    border-radius: 100px;
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.contact-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.contact-chip .chip-icon {
+    font-size: 18px;
+}
+
+.contact-divider {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 8px 0 20px;
+    position: relative;
+}
+
+.contact-divider::before,
+.contact-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: var(--card-border);
+}
+
+.contact-divider::before {
+    left: 0;
+}
+
+.contact-divider::after {
+    right: 0;
+}
+
+.contacts-empty {
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 12px;
+}
+
+/* ===== ФОРМА СВЯЗИ ===== */
+.apple-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.apple-form input {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-color);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+    color: var(--text-main);
+}
+
+.apple-form input:focus {
+    border-color: var(--accent-blue);
+    background: #FFF;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.08);
+}
+
+.apple-form input::placeholder {
+    color: var(--text-muted);
+}
+
+/* ===== ЗАГРУЗКА ===== */
+.loading-projects {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-muted);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--card-border);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== LIGHTBOX ===== */
 .lightbox {
     position: fixed;
     top: 0;
@@ -877,69 +661,355 @@ footer {
     box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
 }
 
-/* ============================================
-   ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА
-   ============================================ */
-.lang-toggle {
-    background: var(--bg-secondary);
-    border: 1px solid var(--card-border);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 0.8rem;
+/* ===== АНИМАЦИИ ===== */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== ФУТЕР ===== */
+footer {
+    padding: 40px 24px;
+    border-top: 1px solid var(--card-border);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: var(--text-main);
+}
+
+/* ===== МАРКДАУН ===== */
+.bento-card .markdown-body {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.bento-card .markdown-body h1,
+.bento-card .markdown-body h2,
+.bento-card .markdown-body h3 {
+    font-size: 1.1rem;
     font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all var(--transition);
+    margin: 8px 0 4px;
+    color: var(--text-main);
 }
 
-.lang-toggle:hover {
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
+.bento-card .markdown-body ul,
+.bento-card .markdown-body ol {
+    padding-left: 20px;
+    margin: 4px 0 8px;
 }
 
-/* ============================================
-   АНИМАЦИЯ ДЛЯ ФИЛЬТРОВ
-   ============================================ */
-.bento-card.filtered-out {
-    display: none;
+.bento-card .markdown-body code {
+    background: var(--bg-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
 }
 
-.bento-card.filtering {
-    transition: all 0.3s ease;
+/* ===== ПУСТОЕ СОСТОЯНИЕ ===== */
+.empty-projects {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
 }
 
-/* ============================================
-   АДАПТИВНОСТЬ
-   ============================================ */
+.empty-projects p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .bento-large {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+}
+
 @media (max-width: 768px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    .bento-large,
+    .bento-medium,
+    .bento-small {
+        grid-column: span 1;
+        grid-row: auto;
+    }
+    .hero-title { font-size: 2.8rem; }
+    .contact-box { padding: 40px 24px; }
+    .section-header h2 { font-size: 2.2rem; }
+    .nav-links a:not(.nav-btn) { display: none; }
+    
     .controls-bar {
         flex-direction: column;
         align-items: stretch;
     }
-    
-    .controls-bar .search-box {
-        max-width: 100%;
+    .controls-bar .search-box { max-width: 100%; }
+    .controls-bar select { width: 100%; }
+    .filter-tags { gap: 6px; }
+    .filter-tag { font-size: 0.75rem; padding: 6px 14px; }
+    .project-stats { flex-wrap: wrap; gap: 12px; }
+    .bento-card .project-image { height: 150px; }
+    .contact-chip { width: 100%; justify-content: center; }
+    .contact-divider::before,
+    .contact-divider::after { width: 20%; }
+}
+
+@media (max-width: 480px) {
+    .bento-card { padding: 24px 20px; }
+    .bento-card h3 { font-size: 1.4rem; }
+    .hero-title { font-size: 2.2rem; }
+    .btn { padding: 12px 20px; font-size: 0.9rem; }
+    .contact-box { padding: 32px 20px; }
+    .contact-box h2 { font-size: 1.6rem; }
+}
+
+/* ============================================
+   УЛУЧШЕННЫЙ GLASSMORPHISM ДЛЯ КАРТОЧЕК
+   ============================================ */
+.bento-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+.bento-card:hover {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(30px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    transform: translateY(-8px) scale(1.01);
+}
+
+/* Тёмные карточки с эффектом стекла */
+.bento-card.dark-card {
+    background: rgba(29, 29, 31, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   КАСТОМНЫЙ КУРСОР
+   ============================================ */
+.cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.cursor-ring {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--accent-blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                width 0.3s ease,
+                height 0.3s ease,
+                border-color 0.3s ease;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+}
+
+.cursor-ring.hover {
+    width: 60px;
+    height: 60px;
+    border-color: var(--accent-hover);
+    opacity: 0.8;
+}
+
+/* На мобильных скрываем кастомный курсор */
+@media (max-width: 768px) {
+    .cursor-dot, .cursor-ring {
+        display: none;
     }
-    
-    .controls-bar select {
-        width: 100%;
-    }
-    
-    .filter-tags {
-        gap: 6px;
-    }
-    
-    .filter-tag {
-        font-size: 0.75rem;
-        padding: 6px 14px;
-    }
-    
-    .project-stats {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-    
-    .bento-card .project-image {
-        height: 150px;
-    }
+}
+
+/* ============================================
+   ГРАДИЕНТНЫЕ ГРАНИЦЫ КАРТОЧЕК
+   ============================================ */
+.bento-card::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border-radius: 33px;
+    background: linear-gradient(135deg, rgba(0,102,204,0.1), rgba(0,102,204,0.02));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.bento-card:hover::before {
+    opacity: 1;
+}
+
+.bento-card.dark-card::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02));
+}
+
+/* ============================================
+   СВЕЧЕНИЕ ПРИ НАВЕДЕНИИ
+   ============================================ */
+.bento-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(0,102,204,0.06), transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bento-card:hover::after {
+    width: 400px;
+    height: 400px;
+}
+
+.bento-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   МОРГАЮЩИЕ ЗВЁЗДЫ НА ФОНЕ
+   ============================================ */
+.star {
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.8; }
+}
+
+.star:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+.star:nth-child(2) { top: 20%; left: 90%; animation-delay: 0.5s; }
+.star:nth-child(3) { top: 40%; left: 10%; animation-delay: 1s; }
+.star:nth-child(4) { top: 60%; left: 85%; animation-delay: 1.5s; }
+.star:nth-child(5) { top: 80%; left: 15%; animation-delay: 2s; }
+.star:nth-child(6) { top: 30%; left: 50%; animation-delay: 0.3s; }
+.star:nth-child(7) { top: 70%; left: 70%; animation-delay: 0.8s; }
+.star:nth-child(8) { top: 50%; left: 30%; animation-delay: 1.2s; }
+
+/* ============================================
+   ПРИЗМАТИЧЕСКИЙ ЭФФЕКТ ЗАГОЛОВКА
+   ============================================ */
+.hero-title {
+    background: linear-gradient(135deg, #1D1D1F 0%, #434353 25%, #0066CC 50%, #434353 75%, #1D1D1F 100%);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: prism 8s ease-in-out infinite;
+    position: relative;
+}
+
+@keyframes prism {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   SCROLL-ИНДИКАТОР
+   ============================================ */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    animation: bounceDown 2s ease-in-out infinite;
+}
+
+.scroll-indicator .mouse {
+    width: 24px;
+    height: 38px;
+    border: 2px solid var(--text-muted);
+    border-radius: 12px;
+    position: relative;
+}
+
+.scroll-indicator .mouse .wheel {
+    width: 3px;
+    height: 8px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scrollWheel 2s ease-in-out infinite;
+}
+
+@keyframes scrollWheel {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    50% { transform: translateX(-50%) translateY(16px); opacity: 0.2; }
+}
+
+@keyframes bounceDown {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
 }

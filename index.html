@@ -8,10 +8,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 </head>
 <body>
-
-    <!-- Навигация -->
+<!-- Звёзды на фоне -->
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+    <!-- ===== НАВИГАЦИЯ ===== -->
     <nav class="glass-nav">
         <div class="nav-content">
             <a href="#" class="logo">Developer.</a>
@@ -19,14 +30,20 @@
                 <a href="#about">Подход</a>
                 <a href="#projects">Проекты</a>
                 <a href="#contact">Связь</a>
-                <a href="admin.html" class="nav-btn">Войти</a>
             </div>
         </div>
     </nav>
 
     <main>
-        <!-- Hero -->
+        <!-- ===== HERO ===== -->
         <section class="hero">
+            <!-- Scroll индикатор -->
+<div class="scroll-indicator">
+    <div class="mouse">
+        <div class="wheel"></div>
+    </div>
+    <span>SCROLL</span>
+</div>
             <div class="hero-content fade-up">
                 <h1 class="hero-title">Проектирую.<br>Разрабатываю.<br>Вдохновляю.</h1>
                 <p class="hero-subtitle">Создаю масштабируемые веб-приложения и продуманную архитектуру. От сложных API до безупречных интерфейсов.</p>
@@ -38,12 +55,45 @@
             <div class="hero-glow"></div>
         </section>
 
-        <!-- Проекты -->
+        <!-- ===== ПРОЕКТЫ ===== -->
         <section id="projects" class="bento-section">
             <div class="section-header fade-up">
                 <h2>Избранные проекты.</h2>
                 <p id="projects-subtitle">Загрузка проектов...</p>
             </div>
+            
+            <!-- Контролы -->
+            <div class="controls-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Поиск проектов...">
+                </div>
+                <select id="category-filter">
+                    <option value="all">📂 Все категории</option>
+                </select>
+                <select id="status-filter">
+                    <option value="all">📊 Все статусы</option>
+                    <option value="published">✅ Опубликованные</option>
+                    <option value="draft">🔄 В разработке</option>
+                    <option value="archived">📦 В архиве</option>
+                </select>
+                <select id="sort-select">
+                    <option value="newest">📅 Новые</option>
+                    <option value="oldest">📅 Старые</option>
+                    <option value="popular">👁️ Популярные</option>
+                    <option value="title">🔤 По алфавиту</option>
+                </select>
+            </div>
+
+            <!-- Фильтры по тегам -->
+            <div id="tag-filters" class="filter-tags">
+                <button class="filter-tag active" data-tag="all">Все</button>
+            </div>
+
+            <!-- Статистика -->
+            <div id="project-stats" class="project-stats"></div>
+
+            <!-- Сетка проектов -->
             <div class="bento-grid" id="projects-container">
                 <div class="loading-projects">
                     <div class="loading-spinner"></div>
@@ -52,28 +102,34 @@
             </div>
         </section>
 
-        <!-- Контакты -->
-        <section id="contact" class="contact-section fade-up">
-            <div class="contact-box">
-                <h2>Свяжитесь со мной</h2>
-                <p id="contact-subtitle">Загрузка контактов...</p>
-                
-                <!-- Динамические контакты -->
-                <div id="contacts-container" class="contacts-grid">
-                    <!-- Сюда будут загружены контакты -->
-                </div>
+        <!-- ===== КОНТАКТЫ ===== -->
+        <!-- ===== КОНТАКТЫ ===== -->
+<section id="contact" class="contact-section fade-up">
+    <div class="contact-box">
+        <h2>Свяжитесь со мной</h2>
+        <p id="contact-subtitle">Загрузка контактов...</p>
+        
+        <!-- Контейнер для контактов -->
+        <div id="contacts-container" class="contacts-grid">
+            <!-- Сюда будут загружены контакты -->
+        </div>
 
-                <div class="contact-divider">или</div>
+        <div class="contact-divider">или</div>
 
-                <form class="apple-form" id="contact-form">
-                    <input type="text" placeholder="Ваше имя" required>
-                    <input type="email" placeholder="Email адрес" required>
-                    <button type="submit" class="btn btn-primary">Отправить сообщение</button>
-                </form>
-            </div>
-        </section>
+        <!-- Форма связи -->
+        <form class="apple-form" id="contact-form">
+            <input type="text" id="contact-name" placeholder="Ваше имя" required>
+            <input type="email" id="contact-email-input" placeholder="Email адрес" required>
+            <button type="submit" class="btn btn-primary">Отправить сообщение</button>
+        </form>
+
+        <!-- Статус отправки -->
+        <div id="contact-form-status" style="display:none; margin-top:16px; padding:12px; border-radius:12px; font-weight:500;"></div>
+    </div>
+</section>
     </main>
 
+    <!-- ===== ФУТЕР ===== -->
     <footer>
         <div class="footer-content">
             <p>© 2026 Developer Portfolio. Все права защищены.</p>
@@ -84,8 +140,19 @@
         </div>
     </footer>
 
+    <!-- ===== LIGHTBOX ===== -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <!-- ===== ПОДКЛЮЧЕНИЕ СКРИПТОВ ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
+    <!-- Плавающие частицы -->
+     <!-- Кастомный курсор -->
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="particles-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0;"></canvas>
 </body>
 </html>
