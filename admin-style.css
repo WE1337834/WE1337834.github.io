@@ -1,13 +1,11 @@
+/* admin-style.css */
 :root {
-    --bg-dark: #0b0f19;
-    --bg-card: #151c2e;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --accent-blue: #3b82f6;
-    --accent-red: #ef4444;
-    --accent-green: #10b981;
-    --border-color: #222f4d;
-    --transition: all 0.2s ease-in-out;
+    --bg-color: #f6f5f1;
+    --text-color: #111111;
+    --text-muted: #555555;
+    --accent-red: #ff3b30;
+    --border-color: #111111;
+    --border-light: #d8d7d2;
 }
 
 * {
@@ -17,248 +15,215 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.5;
 }
 
-header {
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.header-container {
+.container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1.5rem 2rem;
+    padding: 0 2rem;
+}
+
+.admin-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 0;
+}
+
+.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-header h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
+.header-content h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-nav {
+.admin-nav {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
 }
 
-.back-link {
-    color: var(--text-muted);
+.back-site-link {
+    color: var(--text-color);
     text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.back-link:hover {
-    color: var(--text-main);
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
 #logout-btn {
     background: transparent;
     border: 1px solid var(--accent-red);
     color: var(--accent-red);
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    padding: 0.4rem 1rem;
     cursor: pointer;
-    font-weight: 600;
-    transition: var(--transition);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
 }
 
 #logout-btn:hover {
-    background: var(--accent-red);
+    background-color: var(--accent-red);
     color: white;
 }
 
-main {
-    flex: 1;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 3rem 2rem;
-    width: 100%;
+.admin-main {
+    padding: 4rem 2rem;
 }
 
-/* Форма логина */
-.auth-card {
+/* Форма входа */
+.login-box {
     max-width: 400px;
-    margin: 4rem auto;
-    background: var(--bg-card);
+    margin: 5rem auto;
+    background: #ffffff;
     border: 1px solid var(--border-color);
-    padding: 3rem 2rem;
-    border-radius: 16px;
-    text-align: center;
+    padding: 3rem 2.5rem;
 }
 
-.auth-card h2 {
-    margin-bottom: 0.5rem;
-}
-
-.auth-card p {
-    color: var(--text-muted);
-    font-size: 0.9rem;
+.login-box h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
     margin-bottom: 2rem;
+    letter-spacing: -0.02em;
 }
 
-.auth-card input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    color: white;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-}
-
-.auth-card input:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-}
-
-.auth-card button {
-    width: 100%;
-}
-
-/* Сетка админ-панели */
-.admin-grid {
+/* Сетка админки */
+.grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: 4rem;
 }
 
 @media (max-width: 900px) {
-    .admin-grid {
+    .grid-container {
         grid-template-columns: 1fr;
     }
 }
 
-.form-container, .list-container {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2.5rem;
+.panel-section h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 2.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.8rem;
 }
 
-h2 {
-    font-size: 1.4rem;
-    margin-bottom: 2rem;
-}
-
-/* Стили полей ввода */
-.input-group {
-    margin-bottom: 1.2rem;
+/* Элементы формы */
+.input-block {
+    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.input-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
+.input-block label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
     color: var(--text-muted);
+    letter-spacing: 0.05em;
 }
 
-input[type="text"], input[type="url"], textarea {
+input[type="text"], input[type="password"], input[type="url"], textarea {
     width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-light);
+    background: #ffffff;
     padding: 0.8rem 1rem;
-    border-radius: 8px;
-    color: var(--text-main);
     font-family: inherit;
     font-size: 0.95rem;
-    transition: var(--transition);
+    color: var(--text-color);
 }
 
 input:focus, textarea:focus {
     outline: none;
-    border-color: var(--accent-blue);
-    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--border-color);
 }
 
-.form-buttons {
+.btn-row {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
-.btn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
+.btn-submit {
+    background-color: var(--text-color);
+    color: var(--bg-color);
     border: none;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    font-size: 0.85rem;
 }
 
-.btn-primary {
-    background: var(--accent-blue);
-    color: white;
+.btn-submit:hover {
+    background-color: var(--accent-red);
 }
 
-.btn-primary:hover {
-    background: #2563eb;
-}
-
-.btn-secondary {
+.btn-cancel {
     background: transparent;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-light);
     color: var(--text-muted);
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 0.85rem;
 }
 
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+.btn-cancel:hover {
+    border-color: var(--border-color);
+    color: var(--text-color);
 }
 
-/* Список добавленных проектов */
+/* Карточки управления в админке */
 #projects-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.empty-msg {
+.empty-text {
     color: var(--text-muted);
-    text-align: center;
 }
 
 .admin-project-item {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
-    padding: 1.2rem;
-    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    padding: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
 }
 
 .admin-project-item strong {
     display: block;
-    font-size: 1.05rem;
-    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
 .admin-project-item p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     margin-bottom: 0.5rem;
 }
 
 .admin-project-item span {
     font-size: 0.75rem;
-    background: var(--border-color);
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    color: var(--accent-blue);
+    background: var(--bg-color);
+    padding: 0.2rem 0.5rem;
+    font-weight: 600;
 }
 
 .project-actions {
@@ -267,23 +232,15 @@ input:focus, textarea:focus {
 }
 
 .project-actions button {
-    background: var(--border-color);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-weight: 700;
 }
 
-.project-actions button.btn-edit:hover {
-    background: var(--accent-green);
-}
-
-.project-actions button.btn-delete:hover {
-    background: var(--accent-red);
+.project-actions button:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
 }

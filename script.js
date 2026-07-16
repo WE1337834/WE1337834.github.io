@@ -10,34 +10,32 @@ async function loadProjects() {
 
     if (error) {
         console.error('Ошибка загрузки:', error);
-        container.innerHTML = '<p class="loading">Не удалось загрузить проекты. Пожалуйста, зайдите позже.</p>';
+        container.innerHTML = '<div class="loading-state">Не удалось загрузить проекты. Попробуйте обновить страницу.</div>';
         return;
     }
 
     if (projects.length === 0) {
-        container.innerHTML = '<p class="loading">Пока здесь пусто. Зайдите в админ-панель, чтобы добавить проекты.</p>';
+        container.innerHTML = '<div class="loading-state">Проекты пока не добавлены. Зайдите в админ-панель.</div>';
         return;
     }
 
     container.innerHTML = projects.map(project => {
-        // Парсим теги технологий (делим по запятой)
         const tagsHTML = project.technologies 
             ? project.technologies.split(',').map(tech => `<span class="tech-tag">${tech.trim()}</span>`).join('') 
             : '';
 
-        // Генерируем ссылки, если они указаны в БД
         const githubBtn = project.github_link 
-            ? `<a href="${project.github_link}" target="_blank" class="link-github">GitHub</a>` 
+            ? `<a href="${project.github_link}" target="_blank">GitHub</a>` 
             : '';
         const demoBtn = project.demo_link 
-            ? `<a href="${project.demo_link}" target="_blank" class="link-demo">Демо</a>` 
+            ? `<a href="${project.demo_link}" target="_blank">Live Demo</a>` 
             : '';
 
         return `
             <div class="project-card">
                 <div>
                     <h3>${project.title}</h3>
-                    <p>${project.description || 'Описание отсутствует.'}</p>
+                    <p>${project.description || 'Описание не предоставлено.'}</p>
                     <div class="tech-tags">${tagsHTML}</div>
                 </div>
                 <div class="project-links">
@@ -49,5 +47,4 @@ async function loadProjects() {
     }).join('');
 }
 
-// Загружаем проекты при полной загрузке страницы
 document.addEventListener('DOMContentLoaded', loadProjects);
