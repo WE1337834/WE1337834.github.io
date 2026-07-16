@@ -1,89 +1,9 @@
 // admin-script.js
 let editingId = null;
 let markdownEditor = null;
-// ============================================
-//  РАБОТА С АВАТАРКОЙ
-// ============================================
-
 let avatarFile = null;
 let currentAvatarUrl = '';
 
-// Превью аватарки при выборе файла
-function initAvatarUpload() {
-    const fileInput = document.getElementById('about-avatar');
-    if (!fileInput) return;
-
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Проверяем размер файла (макс 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('⚠️ Файл слишком большой! Максимальный размер 5MB.');
-            this.value = '';
-            return;
-        }
-
-        // Проверяем тип файла
-        if (!file.type.startsWith('image/')) {
-            alert('⚠️ Пожалуйста, загрузите изображение.');
-            this.value = '';
-            return;
-        }
-
-        avatarFile = file;
-
-        // Показываем превью
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('about-avatar-preview');
-            const img = document.getElementById('about-avatar-preview-img');
-            img.src = e.target.result;
-            preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-function removeAvatar() {
-    avatarFile = null;
-    currentAvatarUrl = '';
-    document.getElementById('about-avatar').value = '';
-    document.getElementById('about-avatar-preview').style.display = 'none';
-    document.getElementById('about-avatar-preview-img').src = '';
-}
-
-async function uploadAvatar() {
-    if (!avatarFile) return currentAvatarUrl;
-
-    try {
-        const fileExt = avatarFile.name.split('.').pop();
-        const fileName = `avatar_${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabaseClient.storage
-            .from('avatars')
-            .upload(fileName, avatarFile, {
-                cacheControl: '3600',
-                upsert: true
-            });
-
-        if (uploadError) {
-            console.error('Ошибка загрузки аватарки:', uploadError);
-            throw uploadError;
-        }
-
-        const { data: urlData } = supabaseClient.storage
-            .from('avatars')
-            .getPublicUrl(fileName);
-
-        currentAvatarUrl = urlData.publicUrl;
-        return currentAvatarUrl;
-
-    } catch (error) {
-        console.error('Ошибка загрузки аватарки:', error);
-        throw error;
-    }
-}
 // ============================================
 //  АВТОРИЗАЦИЯ
 // ============================================
@@ -101,9 +21,9 @@ function checkAuth() {
         loadProjects();
         loadContacts();
         loadSettings();
-        initAvatarUpload();
-        loadAbout(); // ⬅️ ДОБАВЛЕНО
+        loadAbout();
         initMarkdownEditor();
+        initAvatarUpload();
     } else {
         if (loginOverlay) loginOverlay.style.display = 'flex';
         if (adminPanel) adminPanel.style.display = 'none';
@@ -193,6 +113,83 @@ function initMarkdownEditor() {
             codeSyntaxHighlighting: true,
         }
     });
+}
+
+// ============================================
+//  РАБОТА С АВАТАРКОЙ
+// ============================================
+
+function initAvatarUpload() {
+    const fileInput = document.getElementById('about-avatar');
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('⚠️ Файл слишком большой! Максимальный размер 5MB.');
+            this.value = '';
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            alert('⚠️ Пожалуйста, загрузите изображение.');
+            this.value = '';
+            return;
+        }
+
+        avatarFile = file;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('about-avatar-preview');
+            const img = document.getElementById('about-avatar-preview-img');
+            img.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeAvatar() {
+    avatarFile = null;
+    currentAvatarUrl = '';
+    document.getElementById('about-avatar').value = '';
+    document.getElementById('about-avatar-preview').style.display = 'none';
+    document.getElementById('about-avatar-preview-img').src = '';
+}
+
+async function uploadAvatar() {
+    if (!avatarFile) return currentAvatarUrl;
+
+    try {
+        const fileExt = avatarFile.name.split('.').pop();
+        const fileName = `avatar_${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabaseClient.storage
+            .from('avatars')
+            .upload(fileName, avatarFile, {
+                cacheControl: '3600',
+                upsert: true
+            });
+
+        if (uploadError) {
+            console.error('Ошибка загрузки аватарки:', uploadError);
+            throw uploadError;
+        }
+
+        const { data: urlData } = supabaseClient.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+
+        currentAvatarUrl = urlData.publicUrl;
+        return currentAvatarUrl;
+
+    } catch (error) {
+        console.error('Ошибка загрузки аватарки:', error);
+        throw error;
+    }
 }
 
 // ============================================
@@ -408,15 +405,7 @@ function resetForm() {
 }
 
 // ============================================
-//  ОБО МНЕ (CRUD) — ⬅️ НОВАЯ СЕКЦИЯ
-// ============================================
-
-// ============================================
-//  ОБО МНЕ (CRUD) — с обработкой ошибок
-// ============================================
-
-// ============================================
-//  ОБО МНЕ (CRUD) — УПРОЩЁННАЯ ВЕРСИЯ
+//  ОБО МНЕ (CRUD)
 // ============================================
 
 async function loadAbout() {
@@ -461,7 +450,6 @@ async function loadAbout() {
             document.getElementById('about-education').value = about.education || '';
             document.getElementById('about-bio_md').value = about.bio_md || '';
 
-            // Загружаем аватарку
             currentAvatarUrl = about.avatar_url || '';
             if (currentAvatarUrl) {
                 const preview = document.getElementById('about-avatar-preview');
@@ -477,6 +465,7 @@ async function loadAbout() {
         console.error('❌ Ошибка загрузки "Обо мне":', error);
     }
 }
+
 async function saveAbout(event) {
     event.preventDefault();
     
@@ -487,11 +476,10 @@ async function saveAbout(event) {
         submitBtn.disabled = true;
         submitBtn.textContent = '⏳ Сохранение...';
 
-        // Загружаем аватарку, если выбрана
         let avatarUrl = currentAvatarUrl;
         if (avatarFile) {
             avatarUrl = await uploadAvatar();
-            avatarFile = null; // Очищаем после загрузки
+            avatarFile = null;
         }
 
         const aboutData = {
@@ -567,7 +555,22 @@ function updateAboutPreview(about) {
                 <p style="color: var(--text-muted); font-size: 0.9rem;">${escapeHtml(location)}</p>
             </div>
         </div>
-        <!-- ... остальной код превью ... -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+            <div style="background: var(--bg-primary); padding: 12px 16px; border-radius: 10px;">
+                <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; display: block;">💼 Опыт</span>
+                <p style="font-size: 0.95rem; margin-top: 2px;">${escapeHtml(experience)}</p>
+            </div>
+            <div style="background: var(--bg-primary); padding: 12px 16px; border-radius: 10px;">
+                <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; display: block;">🎓 Образование</span>
+                <p style="font-size: 0.95rem; margin-top: 2px;">${escapeHtml(education)}</p>
+            </div>
+        </div>
+        <div style="padding-top: 12px; border-top: 1px solid var(--border-color);">
+            <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 8px;">📝 Биография</span>
+            <div style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; max-height: 200px; overflow-y: auto; padding: 8px 12px; background: var(--bg-primary); border-radius: 10px;">
+                ${renderMarkdownPreview(bio)}
+            </div>
+        </div>
     `;
 }
 
@@ -964,7 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('project-form')?.addEventListener('submit', saveProject);
     document.getElementById('contacts-form')?.addEventListener('submit', saveContacts);
     document.getElementById('settings-form')?.addEventListener('submit', saveSettings);
-    document.getElementById('about-form')?.addEventListener('submit', saveAbout); // ⬅️ ДОБАВЛЕНО
+    document.getElementById('about-form')?.addEventListener('submit', saveAbout);
     initTabs();
     checkAuth();
 });

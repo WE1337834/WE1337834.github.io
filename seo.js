@@ -1,14 +1,11 @@
 // seo.js
 
-// Базовая SEO-оптимизация
 document.addEventListener('DOMContentLoaded', function() {
-    // Обновляем title
     const pageTitle = document.querySelector('title');
     if (pageTitle) {
         pageTitle.textContent = 'Портфолио разработчика | Веб-приложения, боты, парсеры';
     }
 
-    // Добавляем meta description, если его нет
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
         metaDesc = document.createElement('meta');
@@ -17,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(metaDesc);
     }
 
-    // Добавляем Open Graph
     const ogTags = {
         'og:title': 'Портфолио разработчика',
         'og:description': 'Веб-приложения, телеграм-боты и парсеры',

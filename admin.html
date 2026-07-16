@@ -31,7 +31,6 @@
     <!-- ===== ОСНОВНАЯ ПАНЕЛЬ ===== -->
     <div id="admin-panel" style="display: none;" class="admin-container">
         
-        <!-- Хедер -->
         <header class="admin-header">
             <div class="admin-header-left">
                 <h1>⚙️ Управление портфолио</h1>
@@ -43,16 +42,13 @@
             </div>
         </header>
 
-        <!-- Вкладки -->
-        <!-- Вкладки -->
-<!-- Вкладки -->
-<div class="admin-tabs">
-    <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
-    <button class="tab-btn" data-tab="about">👤 Обо мне</button>
-    <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
-    <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
-    <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
-</div>
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
+            <button class="tab-btn" data-tab="about">👤 Обо мне</button>
+            <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
+            <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
+            <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
+        </div>
 
         <!-- ===== ВКЛАДКА: ПРОЕКТЫ ===== -->
         <div id="tab-projects" class="tab-content active">
@@ -129,6 +125,73 @@
             </div>
         </div>
 
+        <!-- ===== ВКЛАДКА: ОБО МНЕ ===== -->
+        <div id="tab-about" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>👤 Редактирование "Обо мне"</h2>
+                    <span class="card-badge">Информация</span>
+                </div>
+                <form id="about-form" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="about-name">Имя</label>
+                            <input type="text" id="about-name" placeholder="Иван Петров">
+                        </div>
+                        <div class="form-group">
+                            <label for="about-title">Должность</label>
+                            <input type="text" id="about-title" placeholder="Full-Stack Developer">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="about-location">📍 Местоположение</label>
+                        <input type="text" id="about-location" placeholder="Москва, Россия">
+                    </div>
+                    <div class="form-group">
+                        <label for="about-avatar">🖼️ Фото (аватарка)</label>
+                        <input type="file" id="about-avatar" accept="image/*">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Рекомендуемый размер: квадратное фото (500x500px)
+                        </p>
+                        <div id="about-avatar-preview" style="margin-top: 8px; display: none;">
+                            <img id="about-avatar-preview-img" src="" alt="Превью" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border-color);">
+                            <br>
+                            <button type="button" onclick="removeAvatar()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px; margin-top: 4px;">🗑️ Удалить фото</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="about-experience">💼 Опыт работы</label>
+                        <textarea id="about-experience" rows="3" placeholder="Более 3 лет коммерческой разработки..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="about-education">🎓 Образование</label>
+                        <input type="text" id="about-education" placeholder="Высшее образование — Программная инженерия">
+                    </div>
+                    <div class="form-group">
+                        <label for="about-bio_md">📝 Полная биография (Markdown)</label>
+                        <textarea id="about-bio_md" rows="10" placeholder="## Обо мне\n\nТекст в формате Markdown..."></textarea>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Поддерживается Markdown: # Заголовки, **жирный**, *курсив*, `код`, - списки
+                        </p>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+                    </div>
+                    <div id="about-status" class="form-status"></div>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>👁️ Превью на сайте</h2>
+                    <span class="card-badge">Как это выглядит</span>
+                </div>
+                <div id="about-preview" class="about-preview" style="padding: 20px 28px;">
+                    <div style="color: var(--text-muted);">Загрузка превью...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== ВКЛАДКА: АНАЛИТИКА ===== -->
         <div id="tab-analytics" class="tab-content">
             <div class="admin-card">
@@ -141,73 +204,7 @@
                 </div>
             </div>
         </div>
-<!-- ===== ВКЛАДКА: ОБО МНЕ ===== -->
-<div id="tab-about" class="tab-content">
-    <div class="admin-card">
-        <div class="admin-card-header">
-            <h2>👤 Редактирование "Обо мне"</h2>
-            <span class="card-badge">Информация</span>
-        </div>
-        <form id="about-form" class="admin-form">
-            <div class="form-group">
-    <label for="about-avatar">🖼️ Фото (аватарка)</label>
-    <input type="file" id="about-avatar" accept="image/*">
-    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-        Рекомендуемый размер: квадратное фото (500x500px)
-    </p>
-    <div id="about-avatar-preview" style="margin-top: 8px; display: none;">
-        <img id="about-avatar-preview-img" src="" alt="Превью" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border-color);">
-        <br>
-        <button type="button" onclick="removeAvatar()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px; margin-top: 4px;">🗑️ Удалить фото</button>
-    </div>
-</div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="about-name">Имя</label>
-                    <input type="text" id="about-name" placeholder="Иван Петров">
-                </div>
-                <div class="form-group">
-                    <label for="about-title">Должность</label>
-                    <input type="text" id="about-title" placeholder="Full-Stack Developer">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="about-location">📍 Местоположение</label>
-                <input type="text" id="about-location" placeholder="Москва, Россия">
-            </div>
-            <div class="form-group">
-                <label for="about-experience">💼 Опыт работы</label>
-                <textarea id="about-experience" rows="3" placeholder="Более 3 лет коммерческой разработки..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="about-education">🎓 Образование</label>
-                <input type="text" id="about-education" placeholder="Высшее образование — Программная инженерия">
-            </div>
-            <div class="form-group">
-                <label for="about-bio_md">📝 Полная биография (Markdown)</label>
-                <textarea id="about-bio_md" rows="10" placeholder="## Обо мне\n\nТекст в формате Markdown..."></textarea>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                    Поддерживается Markdown: # Заголовки, **жирный**, *курсив*, `код`, - списки
-                </p>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">💾 Сохранить</button>
-            </div>
-            <div id="about-status" class="form-status"></div>
-        </form>
-    </div>
 
-    <!-- Превью -->
-    <div class="admin-card">
-        <div class="admin-card-header">
-            <h2>👁️ Превью на сайте</h2>
-            <span class="card-badge">Как это выглядит</span>
-        </div>
-        <div id="about-preview" class="about-preview" style="padding: 20px 28px;">
-            <div style="color: var(--text-muted);">Загрузка превью...</div>
-        </div>
-    </div>
-</div>
         <!-- ===== ВКЛАДКА: КОНТАКТЫ ===== -->
         <div id="tab-contacts" class="tab-content">
             <div class="admin-card">

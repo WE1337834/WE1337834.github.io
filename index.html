@@ -32,7 +32,7 @@
                 <a href="#about">Обо мне</a>
                 <a href="#projects">Проекты</a>
                 <a href="#contact">Связь</a>
-                <!-- <a href="admin.html" class="nav-btn">Войти</a> -->
+                <a href="admin.html" class="nav-btn">Войти</a>
             </div>
         </div>
     </nav>
@@ -59,7 +59,6 @@
                     <img src="images/photo.jpg" alt="Иван Петров" class="profile-photo">
                     <div class="photo-glow"></div>
                 </div>
-                <!-- Бейдж с опытом -->
                 <div class="experience-badge">
                     <span class="exp-number">3+</span>
                     <span class="exp-label">лет опыта</span>
@@ -92,7 +91,6 @@
                 <p id="projects-subtitle">Загрузка проектов...</p>
             </div>
             
-            <!-- Контролы -->
             <div class="controls-bar">
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
@@ -115,15 +113,12 @@
                 </select>
             </div>
 
-            <!-- Фильтры по тегам -->
             <div id="tag-filters" class="filter-tags">
                 <button class="filter-tag active" data-tag="all">Все</button>
             </div>
 
-            <!-- Статистика -->
             <div id="project-stats" class="project-stats"></div>
 
-            <!-- Сетка проектов -->
             <div class="bento-grid" id="projects-container">
                 <div class="loading-projects">
                     <div class="loading-spinner"></div>
@@ -138,21 +133,16 @@
                 <h2>Свяжитесь со мной</h2>
                 <p id="contact-subtitle">Я всегда на связи — выберите удобный способ</p>
                 
-                <!-- Контакты -->
-                <div id="contacts-container" class="contacts-grid">
-                    <!-- Сюда подгрузятся контакты из Supabase -->
-                </div>
+                <div id="contacts-container" class="contacts-grid"></div>
 
                 <div class="contact-divider">или</div>
 
-                <!-- Форма связи -->
                 <form class="apple-form" id="contact-form">
                     <input type="text" id="contact-name" placeholder="Ваше имя" required>
                     <input type="email" id="contact-email-input" placeholder="Email адрес" required>
                     <button type="submit" class="btn btn-primary">Отправить сообщение</button>
                 </form>
 
-                <!-- Статус отправки -->
                 <div id="contact-form-status" style="display:none; margin-top:16px; padding:12px; border-radius:12px; font-weight:500;"></div>
             </div>
         </section>

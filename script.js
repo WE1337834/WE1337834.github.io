@@ -495,7 +495,6 @@ async function loadAbout() {
         const bio = about.bio_md || 'Биография не заполнена';
         const avatar = about.avatar_url || '';
 
-        // Аватарка — если есть URL, показываем изображение, иначе букву
         const avatarHtml = avatar 
             ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}" class="about-avatar-img">`
             : `<span class="about-avatar-letter">${escapeHtml(name.charAt(0).toUpperCase())}</span>`;
@@ -555,12 +554,7 @@ async function loadContacts() {
         console.error('❌ Контейнер #contacts-container не найден!');
         return;
     }
-// После загрузки контактов, добавляем класс visible
-const contactSection = document.getElementById('contact');
-if (contactSection) {
-    contactSection.classList.add('visible');
-    console.log('✅ Добавлен класс visible для секции контактов');
-}
+
     console.log('🔍 Загрузка контактов...');
 
     try {
@@ -582,6 +576,8 @@ if (contactSection) {
             if (subtitle) {
                 subtitle.textContent = 'Добавьте контакты в админке';
             }
+            const contactSection = document.getElementById('contact');
+            if (contactSection) contactSection.classList.add('visible');
             return;
         }
 
@@ -637,6 +633,12 @@ if (contactSection) {
             footerTelegram.textContent = 'Telegram';
         }
 
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            contactSection.classList.add('visible');
+            console.log('✅ Добавлен класс visible для секции контактов');
+        }
+
     } catch (error) {
         console.error('❌ Ошибка загрузки контактов:', error);
         container.innerHTML = `
@@ -646,6 +648,11 @@ if (contactSection) {
         `;
         if (subtitle) {
             subtitle.textContent = 'Ошибка загрузки контактов';
+        }
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            contactSection.classList.add('visible');
+            console.log('✅ Добавлен класс visible для секции контактов (ошибка)');
         }
     }
 }
