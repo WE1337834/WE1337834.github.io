@@ -6,71 +6,302 @@
     <title>Админка портфолио</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-style.css">
+    <!-- EasyMDE для Markdown -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <h1>Управление проектами</h1>
-            <nav>
-                <a href="index.html" class="back-link">← На сайт</a>
-                <button id="logout-btn" style="display: none;">Выйти</button>
-            </nav>
-        </div>
-    </header>
 
-    <main>
-        <div id="login-form" class="auth-card">
-            <h2>Доступ к админке</h2>
-            <p>Введите пароль администратора</p>
-            <form>
-                <input type="password" id="admin-password" placeholder="Пароль" required>
-                <button type="submit" class="btn btn-primary">Войти</button>
+    <!-- ===== МОДАЛКА ВХОДА ===== -->
+    <div id="login-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon">🔐</div>
+            <h3>Вход в систему</h3>
+            <p class="modal-desc">Введите пароль для доступа к админ-панели</p>
+            <form id="login-form" class="modal-form">
+                <input type="password" id="admin-password" placeholder="Пароль" required class="modal-input">
+                <button type="submit" class="btn btn-primary btn-full">Войти</button>
+                <div id="login-error" class="error-message" style="display:none;">❌ Неверный пароль</div>
             </form>
         </div>
+    </div>
 
-        <div id="admin-panel" style="display: none;">
-            <div class="admin-grid">
-                <div class="form-container">
-                    <h2 id="form-action-title">Добавить новый проект</h2>
-                    <form id="project-form">
-                        <div class="input-group">
-                            <label for="title">Название проекта</label>
-                            <input type="text" id="title" placeholder="Например: Интернет-магазин" required>
+    <!-- ===== ОСНОВНАЯ ПАНЕЛЬ ===== -->
+    <div id="admin-panel" style="display: none;" class="admin-container">
+        
+        <!-- Хедер -->
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <h1>⚙️ Управление портфолио</h1>
+                <span class="admin-badge">v2.0</span>
+            </div>
+            <div class="admin-header-right">
+                <button class="btn btn-ghost" onclick="window.location.href='index.html'">← На сайт</button>
+                <button id="logout-btn" class="btn btn-secondary">Выйти</button>
+            </div>
+        </header>
+
+        <!-- Вкладки -->
+        <!-- Вкладки -->
+<!-- Вкладки -->
+<div class="admin-tabs">
+    <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
+    <button class="tab-btn" data-tab="about">👤 Обо мне</button>
+    <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
+    <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
+    <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
+</div>
+
+        <!-- ===== ВКЛАДКА: ПРОЕКТЫ ===== -->
+        <div id="tab-projects" class="tab-content active">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2 id="form-action-title">➕ Добавить проект</h2>
+                    <span class="card-badge">Новый</span>
+                </div>
+                <form id="project-form" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="title">Название</label>
+                            <input type="text" id="title" placeholder="Название проекта" required>
                         </div>
-                        <div class="input-group">
-                            <label for="description">Описание проекта</label>
-                            <textarea id="description" placeholder="Краткое описание функционала и задач..." rows="4"></textarea>
+                        <div class="form-group">
+                            <label for="category">Категория</label>
+                            <input type="text" id="category" placeholder="Веб-приложение, Бот, Парсер...">
                         </div>
-                        <div class="input-group">
-                            <label for="technologies">Используемые технологии</label>
-                            <input type="text" id="technologies" placeholder="React, Node.js, Supabase (через запятую)">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Статус</label>
+                            <select id="status">
+                                <option value="published">✅ Опубликован</option>
+                                <option value="draft">🔄 В разработке</option>
+                                <option value="archived">📦 В архиве</option>
+                            </select>
                         </div>
-                        <div class="input-group">
-                            <label for="github_link">Ссылка на GitHub</label>
+                        <div class="form-group">
+                            <label for="tags">Теги (через запятую)</label>
+                            <input type="text" id="tags" placeholder="PHP, Python, JS, API">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description_md">Описание (Markdown)</label>
+                        <textarea id="description_md" placeholder="**Жирный** текст, *курсив*, `код`" rows="5"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="image_url">URL изображения</label>
+                            <input type="url" id="image_url" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Или загрузить файл</label>
+                            <input type="file" id="image_file" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="github_link">GitHub</label>
                             <input type="url" id="github_link" placeholder="https://github.com/...">
                         </div>
-                        <div class="input-group">
-                            <label for="demo_link">Ссылка на Демо</label>
-                            <input type="url" id="demo_link" placeholder="https://...">
+                        <div class="form-group">
+                            <label for="demo_link">Демо</label>
+                            <input type="url" id="demo_link" placeholder="https://demo.com">
                         </div>
-                        <div class="form-buttons">
-                            <button type="submit" class="btn btn-primary">Добавить проект</button>
-                            <button type="button" onclick="resetForm()" class="btn btn-secondary">Очистить</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="list-container">
-                    <h2>Существующие проекты</h2>
-                    <div id="projects-list">
-                        <p class="empty-msg">Проектов пока нет</p>
                     </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+                        <button type="button" onclick="resetForm()" class="btn btn-ghost">Очистить</button>
+                    </div>
+                    <div id="form-status" class="form-status"></div>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📋 Все проекты</h2>
+                    <span class="card-badge" id="projects-count">0</span>
+                </div>
+                <div id="projects-list" class="projects-list">
+                    <div class="empty-state"><p>😕 Нет проектов</p></div>
                 </div>
             </div>
         </div>
-    </main>
+
+        <!-- ===== ВКЛАДКА: АНАЛИТИКА ===== -->
+        <div id="tab-analytics" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📊 Аналитика просмотров</h2>
+                    <span class="card-badge">Статистика</span>
+                </div>
+                <div id="analytics-container" class="analytics-container">
+                    <div class="empty-state"><p>⏳ Загрузка данных...</p></div>
+                </div>
+            </div>
+        </div>
+<!-- ===== ВКЛАДКА: ОБО МНЕ ===== -->
+<div id="tab-about" class="tab-content">
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>👤 Редактирование "Обо мне"</h2>
+            <span class="card-badge">Информация</span>
+        </div>
+        <form id="about-form" class="admin-form">
+            <div class="form-group">
+    <label for="about-avatar">🖼️ Фото (аватарка)</label>
+    <input type="file" id="about-avatar" accept="image/*">
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+        Рекомендуемый размер: квадратное фото (500x500px)
+    </p>
+    <div id="about-avatar-preview" style="margin-top: 8px; display: none;">
+        <img id="about-avatar-preview-img" src="" alt="Превью" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border-color);">
+        <br>
+        <button type="button" onclick="removeAvatar()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px; margin-top: 4px;">🗑️ Удалить фото</button>
+    </div>
+</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="about-name">Имя</label>
+                    <input type="text" id="about-name" placeholder="Иван Петров">
+                </div>
+                <div class="form-group">
+                    <label for="about-title">Должность</label>
+                    <input type="text" id="about-title" placeholder="Full-Stack Developer">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="about-location">📍 Местоположение</label>
+                <input type="text" id="about-location" placeholder="Москва, Россия">
+            </div>
+            <div class="form-group">
+                <label for="about-experience">💼 Опыт работы</label>
+                <textarea id="about-experience" rows="3" placeholder="Более 3 лет коммерческой разработки..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="about-education">🎓 Образование</label>
+                <input type="text" id="about-education" placeholder="Высшее образование — Программная инженерия">
+            </div>
+            <div class="form-group">
+                <label for="about-bio_md">📝 Полная биография (Markdown)</label>
+                <textarea id="about-bio_md" rows="10" placeholder="## Обо мне\n\nТекст в формате Markdown..."></textarea>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                    Поддерживается Markdown: # Заголовки, **жирный**, *курсив*, `код`, - списки
+                </p>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+            </div>
+            <div id="about-status" class="form-status"></div>
+        </form>
+    </div>
+
+    <!-- Превью -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>👁️ Превью на сайте</h2>
+            <span class="card-badge">Как это выглядит</span>
+        </div>
+        <div id="about-preview" class="about-preview" style="padding: 20px 28px;">
+            <div style="color: var(--text-muted);">Загрузка превью...</div>
+        </div>
+    </div>
+</div>
+        <!-- ===== ВКЛАДКА: КОНТАКТЫ ===== -->
+        <div id="tab-contacts" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📞 Контакты</h2>
+                </div>
+                <form id="contacts-form" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-email">📧 Email</label>
+                            <input type="email" id="contact-email" placeholder="ivan@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-telegram">💬 Telegram</label>
+                            <input type="text" id="contact-telegram" placeholder="@ivan_petrov">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-github">🐙 GitHub</label>
+                            <input type="url" id="contact-github" placeholder="https://github.com/username">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-linkedin">💼 LinkedIn</label>
+                            <input type="url" id="contact-linkedin" placeholder="https://linkedin.com/in/username">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-phone">📱 Телефон</label>
+                            <input type="text" id="contact-phone" placeholder="+7 999 123-45-67">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-whatsapp">💚 WhatsApp</label>
+                            <input type="text" id="contact-whatsapp" placeholder="+7 999 123-45-67">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Сохранить контакты</button>
+                    </div>
+                    <div id="contacts-status" class="form-status"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== ВКЛАДКА: НАСТРОЙКИ ===== -->
+        <div id="tab-settings" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>⚙️ Настройки</h2>
+                </div>
+                <form id="settings-form" class="admin-form">
+                    <div class="form-group">
+                        <label for="settings-telegram-bot">🤖 Telegram Bot Token</label>
+                        <input type="text" id="settings-telegram-bot" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxyz">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Получить у <a href="https://t.me/botfather" target="_blank">@BotFather</a>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-telegram-chat">📨 Telegram Chat ID</label>
+                        <input type="text" id="settings-telegram-chat" placeholder="123456789">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Узнать у <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-site-url">🌐 URL сайта</label>
+                        <input type="url" id="settings-site-url" placeholder="https://ваш-сайт.github.io">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Сохранить настройки</button>
+                    </div>
+                    <div id="settings-status" class="form-status"></div>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📨 Тестовое уведомление</h2>
+                </div>
+                <div style="padding: 20px 28px;">
+                    <button onclick="sendTestNotification()" class="btn btn-primary">📨 Отправить тестовое уведомление</button>
+                    <div id="notification-status" class="form-status" style="margin-top: 12px;"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Lightbox для изображений -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="">
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
