@@ -6,14 +6,17 @@ function checkAuth() {
     const isLoggedIn = localStorage.getItem('isAdmin') === 'true';
     const loginForm = document.getElementById('login-form');
     const adminPanel = document.getElementById('admin-panel');
+    const logoutBtn = document.getElementById('logout-btn');
 
     if (isLoggedIn) {
         if (loginForm) loginForm.style.display = 'none';
         if (adminPanel) adminPanel.style.display = 'block';
+        if (logoutBtn) logoutBtn.style.display = 'block';
         loadProjects();
     } else {
         if (loginForm) loginForm.style.display = 'block';
         if (adminPanel) adminPanel.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
     }
 }
 
@@ -22,8 +25,8 @@ async function login(event) {
     event.preventDefault();
     const password = document.getElementById('admin-password').value;
     
-    // Простая проверка (можно улучшить с Supabase Auth)
-    if (password === 'admin123') { // Смените пароль!
+    // Временный пароль для входа. Измени, если потребуется!
+    if (password === 'admin123') { 
         localStorage.setItem('isAdmin', 'true');
         checkAuth();
     } else {
@@ -53,7 +56,7 @@ async function loadProjects() {
     if (!container) return;
 
     if (projects.length === 0) {
-        container.innerHTML = '<p>Нет проектов</p>';
+        container.innerHTML = '<p class="empty-msg">Нет проектов</p>';
         return;
     }
 
@@ -61,18 +64,18 @@ async function loadProjects() {
         <div class="admin-project-item">
             <div>
                 <strong>${project.title}</strong>
-                <p>${project.description || ''}</p>
-                <span>${project.technologies || ''}</span>
+                <p>${project.description ? project.description.substring(0, 80) + '...' : 'Без описания'}</p>
+                <span>${project.technologies || 'Без технологий'}</span>
             </div>
-            <div>
-                <button onclick="editProject(${project.id})">✏️</button>
-                <button onclick="deleteProject(${project.id})">🗑️</button>
+            <div class="project-actions">
+                <button class="btn-edit" onclick="editProject(${project.id})" title="Редактировать">✏️</button>
+                <button class="btn-delete" onclick="deleteProject(${project.id})" title="Удалить">🗑️</button>
             </div>
         </div>
     `).join('');
 }
 
-// Добавление/обновление проекта
+// Добавление / обновление проекта в БД
 async function saveProject(event) {
     event.preventDefault();
     
@@ -83,7 +86,7 @@ async function saveProject(event) {
     const demo_link = document.getElementById('demo_link').value;
 
     if (editingId) {
-        // Обновление
+        // Обновление существующего проекта
         const { error } = await supabaseClient
             .from('projects')
             .update({ title, description, technologies, github_link, demo_link })
@@ -95,7 +98,7 @@ async function saveProject(event) {
         }
         editingId = null;
     } else {
-        // Добавление
+        // Создание нового
         const { error } = await supabaseClient
             .from('projects')
             .insert([{ title, description, technologies, github_link, demo_link }]);
@@ -107,10 +110,12 @@ async function saveProject(event) {
     }
 
     document.getElementById('project-form').reset();
+    document.getElementById('form-action-title').textContent = 'Добавить новый проект';
+    document.querySelector('#project-form button[type="submit"]').textContent = 'Добавить проект';
     loadProjects();
 }
 
-// Редактирование
+// Загрузка данных для редактирования
 async function editProject(id) {
     const { data: project, error } = await supabaseClient
         .from('projects')
@@ -129,12 +134,14 @@ async function editProject(id) {
     document.getElementById('technologies').value = project.technologies || '';
     document.getElementById('github_link').value = project.github_link || '';
     document.getElementById('demo_link').value = project.demo_link || '';
-    document.querySelector('button[type="submit"]').textContent = 'Обновить проект';
+    
+    document.getElementById('form-action-title').textContent = 'Редактировать проект';
+    document.querySelector('#project-form button[type="submit"]').textContent = 'Сохранить изменения';
 }
 
-// Удаление
+// Удаление проекта
 async function deleteProject(id) {
-    if (!confirm('Удалить проект?')) return;
+    if (!confirm('Вы действительно хотите удалить этот проект?')) return;
 
     const { error } = await supabaseClient
         .from('projects')
@@ -149,9 +156,8 @@ async function deleteProject(id) {
     loadProjects();
 }
 
-// Инициализация
+// Инициализация событий
 document.addEventListener('DOMContentLoaded', () => {
-    // Навешиваем обработчики событий
     document.getElementById('login-form')?.addEventListener('submit', login);
     document.getElementById('project-form')?.addEventListener('submit', saveProject);
     document.getElementById('logout-btn')?.addEventListener('click', logout);
@@ -159,9 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
 });
 
-// Очистка формы при добавлении нового
+// Сброс формы
 function resetForm() {
     editingId = null;
     document.getElementById('project-form').reset();
-    document.querySelector('button[type="submit"]').textContent = 'Добавить проект';
+    document.getElementById('form-action-title').textContent = 'Добавить новый проект';
+    document.querySelector('#project-form button[type="submit"]').textContent = 'Добавить проект';
 }

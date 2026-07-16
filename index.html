@@ -3,29 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моё портфолио</title>
+    <title>Портфолио разработчика</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Мои проекты</h1>
-        <nav>
-            <a href="admin.html">Админка</a>
-        </nav>
+        <div class="header-container">
+            <a href="#" class="logo">Dev<span>.Portfolio</span></a>
+            <nav>
+                <a href="#about">Обо мне</a>
+                <a href="#projects-section">Проекты</a>
+                <a href="#contacts">Контакты</a>
+                <a href="admin.html" class="admin-link">Админка</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <section id="projects-container">
-            <!-- Проекты подгрузятся сюда через JavaScript -->
-            <p>Загрузка...</p>
+        <section id="hero" class="hero">
+            <div class="hero-content">
+                <span class="hero-badge">Доступен для новых проектов</span>
+                <h1>Создаю современные<br><span>веб-приложения</span></h1>
+                <p>Фронтенд-разработчик с фокусом на высокую производительность, чистый код и удобные интерфейсы. Связываю интерфейсы с базами данных и создаю логику, которая работает.</p>
+                <div class="hero-buttons">
+                    <a href="#projects-section" class="btn btn-primary">Мои работы</a>
+                    <a href="#contacts" class="btn btn-secondary">Связаться со мной</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="section-title">
+                <h2>Обо мне</h2>
+                <p>Мой стек и ключевые навыки</p>
+            </div>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>Я занимаюсь веб-разработкой, проектированием архитектуры приложений и созданием интерактивных веб-сервисов. Моя цель — создавать решения, которые решают задачи бизнеса и радуют пользователей.</p>
+                    <p>Имею опыт работы со связкой скриптов и стилей, проектированием API, разграничением прав доступа пользователей и интеграцией современных Serverless-решений (таких как Supabase).</p>
+                </div>
+                <div class="skills-card">
+                    <h3>Мой стек технологий</h3>
+                    <div class="skills-list">
+                        <span class="skill-tag">JavaScript (ES6+)</span>
+                        <span class="skill-tag">HTML5 & CSS3</span>
+                        <span class="skill-tag">REST API</span>
+                        <span class="skill-tag">Supabase / PostgreSQL</span>
+                        <span class="skill-tag">Git / GitHub</span>
+                        <span class="skill-tag">Responsive Design</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects-section" class="projects-section">
+            <div class="section-title">
+                <h2>Выполненные проекты</h2>
+                <p>Реальные кейсы, код и рабочие демо-версии</p>
+            </div>
+            <div id="projects-container">
+                <div class="loading">Загрузка проектов...</div>
+            </div>
+        </section>
+
+        <section id="contacts" class="contacts">
+            <div class="section-title">
+                <h2>Контакты</h2>
+                <p>Свяжитесь со мной удобным для вас способом</p>
+            </div>
+            <div class="contacts-wrapper">
+                <div class="contact-card">
+                    <h3>Обсудим ваш проект?</h3>
+                    <p>Я всегда открыт для интересных предложений, full-time работы или проектного фриланса.</p>
+                    <div class="contact-links">
+                        <a href="https://t.me/your_telegram" target="_blank" class="contact-item telegram">
+                            <span>Telegram</span>
+                            <strong>@your_telegram</strong>
+                        </a>
+                        <a href="mailto:your_email@example.com" class="contact-item email">
+                            <span>Электронная почта</span>
+                            <strong>your_email@example.com</strong>
+                        </a>
+                        <a href="https://github.com/your_github" target="_blank" class="contact-item github">
+                            <span>GitHub</span>
+                            <strong>github.com/your_github</strong>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <footer>
-        <p>© 2026 Моё портфолио</p>
+        <p>© 2026 Dev.Portfolio. Все права защищены.</p>
     </footer>
 
-    <!-- Подключаем Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
