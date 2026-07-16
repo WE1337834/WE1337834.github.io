@@ -3,102 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Разработчик — Портфолио</title>
+    <title>Портфолио Разработчика</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="site-header">
-        <div class="container header-grid">
-            <a href="#" class="logo">DESIGN<span>&</span>CODE</a>
-            <nav class="main-nav">
-                <a href="#about">Профайл</a>
+    <!-- Навигация -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <a href="#" class="logo">Developer.</a>
+            <div class="nav-links">
+                <a href="#about">Подход</a>
                 <a href="#projects">Проекты</a>
-                <a href="#contacts">Контакты</a>
-                <a href="admin.html" class="nav-admin-btn">Админ</a>
-            </nav>
+                <a href="#contact">Связь</a>
+                <a href="admin.html" class="nav-btn">Войти</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <section class="hero-section">
-            <div class="hero-grid">
-                <div class="hero-left">
-                    <span class="status-badge">// ДОСТУПЕН ДЛЯ ПРОЕКТОВ</span>
+    <main>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content fade-up">
+                <h1 class="hero-title">Проектирую.<br>Разрабатываю.<br>Вдохновляю.</h1>
+                <p class="hero-subtitle">Создаю масштабируемые веб-приложения и продуманную архитектуру. От сложных API до безупречных интерфейсов.</p>
+                <div class="hero-actions">
+                    <a href="#projects" class="btn btn-primary">Смотреть работы</a>
+                    <a href="#contact" class="btn btn-secondary">Связаться со мной</a>
                 </div>
-                <div class="hero-right">
-                    <h1>Разрабатываю интерфейсы и сложные веб-системы.</h1>
-                    <p class="hero-lead">Фронтенд-разработчик. Специализируюсь на чистой архитектуре JavaScript, интеграции API и создании отказоустойчивых веб-приложений с ролевыми моделями доступа.</p>
-                    <div class="hero-actions">
-                        <a href="#projects" class="btn btn-black">Смотреть проекты</a>
-                        <a href="#contacts" class="btn btn-outline">Написать мне</a>
-                    </div>
+            </div>
+            <div class="hero-glow"></div>
+        </section>
+
+        <!-- Проекты -->
+        <section id="projects" class="bento-section">
+            <div class="section-header fade-up">
+                <h2>Избранные проекты.</h2>
+                <p id="projects-subtitle">Загрузка проектов...</p>
+            </div>
+            <div class="bento-grid" id="projects-container">
+                <div class="loading-projects">
+                    <div class="loading-spinner"></div>
+                    <p>Загрузка проектов...</p>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="section">
-            <h2 class="section-num">01 / ПРОФАЙЛ</h2>
-            <div class="about-grid">
-                <div class="about-desc">
-                    <p class="large-text">Я создаю продукты, в которых логика кода и эстетика интерфейса работают как единое целое.</p>
-                    <p>Мой подход основан на принципах модульности, понятной структуры файлов и высокой производительности. Верю, что хороший интерфейс — это не украшательство, а эффективное решение бизнес-задач клиента.</p>
+        <!-- Контакты -->
+        <section id="contact" class="contact-section fade-up">
+            <div class="contact-box">
+                <h2>Свяжитесь со мной</h2>
+                <p id="contact-subtitle">Загрузка контактов...</p>
+                
+                <!-- Динамические контакты -->
+                <div id="contacts-container" class="contacts-grid">
+                    <!-- Сюда будут загружены контакты -->
                 </div>
-                <div class="about-skills">
-                    <h3 class="small-title">ТЕХНОЛОГИЧЕСКИЙ СТЕК</h3>
-                    <ul class="skills-grid">
-                        <li>JavaScript (ES6+)</li>
-                        <li>HTML5 / CSS3 (Sass)</li>
-                        <li>REST API</li>
-                        <li>Supabase / PostgreSQL</li>
-                        <li>Git / GitHub</li>
-                        <li>SPA Architecture</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
 
-        <section id="projects" class="section">
-            <h2 class="section-num">02 / ПРОЕКТЫ</h2>
-            <div id="projects-container" class="projects-grid">
-                <div class="loading-state">Получение данных с сервера...</div>
-            </div>
-        </section>
+                <div class="contact-divider">или</div>
 
-        <section id="contacts" class="section">
-            <h2 class="section-num">03 / СВЯЗЬ</h2>
-            <div class="contacts-grid">
-                <div class="contacts-left">
-                    <p class="large-text">Обсудим проект или вакансию?</p>
-                    <p>Напишите мне в удобный мессенджер или отправьте техническое задание на почту. Обычно я отвечаю в течение пары часов.</p>
-                </div>
-                <div class="contacts-right">
-                    <div class="contact-links-list">
-                        <a href="https://t.me/your_telegram" class="contact-row" target="_blank">
-                            <span class="label">Telegram</span>
-                            <span class="val">@your_telegram ↗</span>
-                        </a>
-                        <a href="mailto:your_email@example.com" class="contact-row">
-                            <span class="label">Email</span>
-                            <span class="val">your_email@example.com ↗</span>
-                        </a>
-                        <a href="https://github.com/your_github" class="contact-row" target="_blank">
-                            <span class="label">GitHub</span>
-                            <span class="val">github.com/your_github ↗</span>
-                        </a>
-                    </div>
-                </div>
+                <form class="apple-form" id="contact-form">
+                    <input type="text" placeholder="Ваше имя" required>
+                    <input type="email" placeholder="Email адрес" required>
+                    <button type="submit" class="btn btn-primary">Отправить сообщение</button>
+                </form>
             </div>
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <p>© 2026 DESIGN&CODE. Все права защищены.</p>
-            <p>Сделано по канонам швейцарского дизайна.</p>
+    <footer>
+        <div class="footer-content">
+            <p>© 2026 Developer Portfolio. Все права защищены.</p>
+            <div class="footer-links">
+                <a href="#" id="footer-github">GitHub</a>
+                <a href="#" id="footer-telegram">Telegram</a>
+            </div>
         </div>
     </footer>
 

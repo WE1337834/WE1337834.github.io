@@ -1,246 +1,792 @@
-/* admin-style.css */
+/* ============================================
+   APPLE-STYLE ADMIN PANEL
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
-    --bg-color: #f6f5f1;
-    --text-color: #111111;
-    --text-muted: #555555;
-    --accent-red: #ff3b30;
-    --border-color: #111111;
-    --border-light: #d8d7d2;
+    --bg-primary: #f5f5f7;
+    --bg-secondary: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --accent-blue: #007aff;
+    --accent-hover: #0066d9;
+    --border-color: rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    line-height: 1.5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
 }
 
-.container {
-    max-width: 1200px;
+/* ============================================
+   МОДАЛЬНОЕ ОКНО (ВХОД)
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-card {
+    background: var(--bg-secondary);
+    width: 380px;
+    padding: 40px 36px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.modal-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.modal-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+
+.modal-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 24px;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-input {
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-family: inherit;
+    transition: all var(--transition);
+    outline: none;
+    background: var(--bg-primary);
+}
+
+.modal-input:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+.error-message {
+    color: #ff3b30;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px;
+    background: rgba(255, 59, 48, 0.08);
+    border-radius: var(--radius-sm);
+    margin-top: 4px;
+}
+
+/* ============================================
+   ОСНОВНАЯ ПАНЕЛЬ
+   ============================================ */
+.admin-container {
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 0 2rem;
+    animation: slideUp 0.4s ease;
 }
 
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== ХЕДЕР ===== */
 .admin-header {
-    background-color: #ffffff;
-    border-bottom: 1px solid var(--border-color);
-    padding: 1.5rem 0;
-}
-
-.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 24px 0 32px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
-.header-content h1 {
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.admin-nav {
+.admin-header-left {
     display: flex;
-    gap: 1.5rem;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-header-left h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.admin-badge {
+    background: var(--border-color);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.admin-header-right {
+    display: flex;
+    gap: 12px;
     align-items: center;
 }
 
-.back-site-link {
-    color: var(--text-color);
+/* ===== КНОПКИ (Apple-стиль) ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-#logout-btn {
-    background: transparent;
-    border: 1px solid var(--accent-red);
-    color: var(--accent-red);
-    padding: 0.4rem 1rem;
+    border: none;
     cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.8rem;
+    transition: all var(--transition);
 }
 
-#logout-btn:hover {
-    background-color: var(--accent-red);
+.btn-primary {
+    background: var(--accent-blue);
     color: white;
+    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.25);
 }
 
-.admin-main {
-    padding: 4rem 2rem;
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0, 122, 255, 0.35);
 }
 
-/* Форма входа */
-.login-box {
-    max-width: 400px;
-    margin: 5rem auto;
-    background: #ffffff;
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: var(--bg-primary);
+    color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 3rem 2.5rem;
 }
 
-.login-box h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 2rem;
-    letter-spacing: -0.02em;
+.btn-secondary:hover {
+    background: #e8e8ed;
 }
 
-/* Сетка админки */
-.grid-container {
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 10px 12px;
+}
+
+.btn-ghost:hover {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* ===== КАРТОЧКИ ===== */
+.admin-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow var(--transition);
+}
+
+.admin-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.admin-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.admin-card-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.card-badge {
+    background: var(--border-color);
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* ===== ФОРМА ===== */
+.admin-form {
+    padding: 28px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 15px;
+    transition: all var(--transition);
+    outline: none;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.08);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 16px;
 }
 
-@media (max-width: 900px) {
-    .grid-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-.panel-section h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 2.5rem;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.8rem;
-}
-
-/* Элементы формы */
-.input-block {
-    margin-bottom: 1.5rem;
+.form-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
 }
 
-.input-block label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
+.form-status {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
 }
 
-input[type="text"], input[type="password"], input[type="url"], textarea {
-    width: 100%;
-    border: 1px solid var(--border-light);
-    background: #ffffff;
-    padding: 0.8rem 1rem;
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--text-color);
+.form-status.success {
+    display: block;
+    background: rgba(52, 199, 89, 0.1);
+    color: #34c759;
 }
 
-input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--border-color);
+.form-status.error {
+    display: block;
+    background: rgba(255, 59, 48, 0.08);
+    color: #ff3b30;
 }
 
-.btn-row {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
+/* ===== СПИСОК ПРОЕКТОВ ===== */
+.projects-list {
+    padding: 8px 0;
 }
 
-.btn-submit {
-    background-color: var(--text-color);
-    color: var(--bg-color);
-    border: none;
-    padding: 1rem 2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.btn-submit:hover {
-    background-color: var(--accent-red);
-}
-
-.btn-cancel {
-    background: transparent;
-    border: 1px solid var(--border-light);
-    color: var(--text-muted);
-    padding: 1rem 2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.btn-cancel:hover {
-    border-color: var(--border-color);
-    color: var(--text-color);
-}
-
-/* Карточки управления в админке */
-#projects-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.empty-text {
-    color: var(--text-muted);
-}
-
-.admin-project-item {
-    background: #ffffff;
-    border: 1px solid var(--border-light);
-    padding: 1.5rem;
+.project-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition);
 }
 
-.admin-project-item strong {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+.project-item:last-child {
+    border-bottom: none;
 }
 
-.admin-project-item p {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
+.project-item:hover {
+    background: rgba(0, 0, 0, 0.02);
 }
 
-.admin-project-item span {
-    font-size: 0.75rem;
-    background: var(--bg-color);
-    padding: 0.2rem 0.5rem;
+.project-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.project-info h4 {
+    font-size: 16px;
     font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.project-info p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.project-tech span {
+    background: var(--bg-primary);
+    padding: 2px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
 }
 
 .project-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 16px;
 }
 
 .project-actions button {
-    border: 1px solid var(--border-color);
-    background: transparent;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.85rem;
+    padding: 6px 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: 700;
+    transition: all var(--transition);
+    font-family: inherit;
 }
 
-.project-actions button:hover {
-    background: var(--text-color);
-    color: var(--bg-color);
+.btn-edit {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--accent-blue);
+}
+
+.btn-edit:hover {
+    background: rgba(0, 122, 255, 0.2);
+}
+
+.btn-delete {
+    background: rgba(255, 59, 48, 0.08);
+    color: #ff3b30;
+}
+
+.btn-delete:hover {
+    background: rgba(255, 59, 48, 0.2);
+}
+
+.empty-state {
+    padding: 60px 28px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.empty-state p {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.empty-state-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+   ============================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .admin-header-left h1 {
+        font-size: 22px;
+    }
+
+    .admin-header-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .admin-form {
+        padding: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-card-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .project-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .project-actions {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .project-actions button {
+        flex: 1;
+        text-align: center;
+    }
+
+    .modal-card {
+        width: 90%;
+        padding: 32px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-header-left h1 {
+        font-size: 18px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 8px 16px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+}
+/* ============================================
+   ВКЛАДКИ
+   ============================================ */
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: var(--bg-secondary);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.tab-btn.active {
+    background: var(--accent-blue);
+    color: white;
+    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.25);
+}
+
+.tab-btn.active:hover {
+    background: var(--accent-hover);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ============================================
+   ПРЕВЬЮ КОНТАКТОВ
+   ============================================ */
+.contacts-preview {
+    padding: 20px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.contact-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.preview-icon {
+    font-size: 20px;
+    width: 32px;
+}
+
+.contact-preview-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.contact-preview-item span:last-child:empty::before {
+    content: 'не указан';
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ ПРЕВЬЮ
+   ============================================ */
+@media (max-width: 768px) {
+    .contacts-preview {
+        grid-template-columns: 1fr;
+        padding: 16px 20px;
+    }
+    
+    .admin-tabs {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .tab-btn {
+        text-align: center;
+    }
+}
+/* ============================================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ АДМИНКИ
+   ============================================ */
+
+/* Переводы */
+.translations-list {
+    padding: 8px 0;
+}
+
+.translation-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+}
+
+.translation-item:last-child {
+    border-bottom: none;
+}
+
+.translation-item input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: var(--bg-primary);
+    transition: all var(--transition);
+}
+
+.translation-item input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.08);
+}
+
+.translation-item .trans-key {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.translation-item .trans-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.translation-item .trans-actions button {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.translation-item .trans-actions .btn-save {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.translation-item .trans-actions .btn-delete {
+    background: rgba(255, 59, 48, 0.08);
+    color: #ff3b30;
+}
+
+/* Настройки */
+.settings-group {
+    padding: 8px 0;
+}
+
+.settings-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+}
+
+.settings-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all var(--transition);
+    outline: none;
+    background: var(--bg-primary);
+}
+
+.settings-group input:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.08);
+}
+
+/* Тестовое уведомление */
+.notification-test {
+    padding: 20px 28px;
+}
+
+.notification-test .btn {
+    margin-bottom: 12px;
+}
+
+/* Адаптивность для переводов */
+@media (max-width: 768px) {
+    .translation-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 16px 20px;
+    }
+    
+    .translation-item .trans-key {
+        font-size: 0.8rem;
+    }
+    
+    .translation-item .trans-actions {
+        justify-content: flex-end;
+    }
+}
+
+/* ============================================
+   СТАТУСЫ В АДМИНКЕ
+   ============================================ */
+.project-item .project-status-badge {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.project-item .project-status-badge.published {
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
+}
+
+.project-item .project-status-badge.draft {
+    background: rgba(255, 149, 0, 0.12);
+    color: #ff9500;
+}
+
+.project-item .project-status-badge.archived {
+    background: rgba(142, 142, 147, 0.12);
+    color: #8e8e93;
 }
