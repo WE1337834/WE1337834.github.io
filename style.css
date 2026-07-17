@@ -1446,3 +1446,232 @@ footer {
         padding: 20px 12px;
     }
 }
+
+/* ============================================
+   ФОРМА СВЯЗИ (УЛУЧШЕННАЯ)
+   ============================================ */
+
+.contact-header {
+    margin-bottom: 32px;
+}
+
+.contact-header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+
+.contact-header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+.contact-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.contact-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contact-form .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-form .form-group .label-icon {
+    font-size: 1rem;
+}
+
+.contact-form .form-group input,
+.contact-form .form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-color);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.25s ease;
+    outline: none;
+    color: var(--text-main);
+}
+
+.contact-form .form-group input:focus,
+.contact-form .form-group textarea:focus {
+    border-color: var(--accent-blue);
+    background: #FFF;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.08);
+}
+
+.contact-form .form-group input::placeholder,
+.contact-form .form-group textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.contact-form .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background: var(--accent-blue);
+    color: #FFF;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 102, 204, 0.3);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-submit:hover svg {
+    transform: translateX(4px);
+}
+
+/* ===== СТАТУС ОТПРАВКИ ===== */
+.form-status-message {
+    margin-top: 16px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: none;
+}
+
+.form-status-message.success {
+    display: block;
+    background: rgba(52, 199, 89, 0.1);
+    color: #34c759;
+    border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.form-status-message.error {
+    display: block;
+    background: rgba(255, 59, 48, 0.08);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.15);
+}
+
+/* ===== СОЦИАЛЬНЫЕ ССЫЛКИ ===== */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-color);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background: var(--accent-blue);
+    color: #FFF;
+    border-color: var(--accent-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 102, 204, 0.25);
+}
+
+.social-link svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ ФОРМЫ
+   ============================================ */
+@media (max-width: 768px) {
+    .contact-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .contact-box {
+        padding: 32px 24px;
+    }
+
+    .contact-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .btn-submit {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .social-links {
+        gap: 12px;
+    }
+
+    .social-link {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-box {
+        padding: 24px 16px;
+        border-radius: 20px;
+    }
+
+    .contact-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
+}

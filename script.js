@@ -661,6 +661,10 @@ async function loadContacts() {
 //  ФОРМА СВЯЗИ
 // ============================================
 
+// ============================================
+//  ФОРМА СВЯЗИ (ОБНОВЛЁННАЯ)
+// ============================================
+
 function initContactForm() {
     const form = document.getElementById('contact-form');
     if (!form) {
@@ -671,40 +675,133 @@ function initContactForm() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Получаем данные из полей
         const nameInput = document.getElementById('contact-name');
         const emailInput = document.getElementById('contact-email-input');
+        const subjectInput = document.getElementById('contact-subject');
+        const messageInput = document.getElementById('contact-message');
         const statusEl = document.getElementById('contact-form-status');
         
         const name = nameInput ? nameInput.value.trim() : '';
         const email = emailInput ? emailInput.value.trim() : '';
+        const subject = subjectInput ? subjectInput.value.trim() : 'Без темы';
+        const message = messageInput ? messageInput.value.trim() : '';
 
-        if (!name || !email) {
-            if (statusEl) {
-                statusEl.style.display = 'block';
-                statusEl.textContent = '⚠️ Пожалуйста, заполните все поля';
-                statusEl.style.background = 'rgba(255, 59, 48, 0.08)';
-                statusEl.style.color = '#ff3b30';
-            }
+        // Валидация
+        if (!name || !email || !message) {
+            showFormStatus('⚠️ Пожалуйста, заполните все обязательные поля', 'error');
             return;
         }
 
-        if (statusEl) {
-            statusEl.style.display = 'block';
-            statusEl.textContent = `✅ Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`;
-            statusEl.style.background = 'rgba(52, 199, 89, 0.1)';
-            statusEl.style.color = '#34c759';
+        if (!isValidEmail(email)) {
+            showFormStatus('⚠️ Пожалуйста, введите корректный email адрес', 'error');
+            return;
         }
 
+        // Формируем сообщение
+        const fullMessage = `
+📝 Сообщение от ${name}
+
+📧 Email: ${email}
+📌 Тема: ${subject}
+
+💬 Сообщение:
+${message}
+        `.trim();
+
+        // Отправляем через EmailJS или Telegram (здесь используется Telegram)
+        sendContactMessage(name, email, subject, fullMessage);
+
+        // Показываем успех
+        showFormStatus(`✅ Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`, 'success');
         form.reset();
 
+        // Скрываем сообщение через 5 секунд
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.style.display = 'none';
+            const el = document.getElementById('contact-form-status');
+            if (el) {
+                el.style.display = 'none';
+                el.className = 'form-status-message';
             }
         }, 5000);
     });
 }
 
+// Валидация email
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Показ статуса формы
+function showFormStatus(message, type = 'success') {
+    const statusEl = document.getElementById('contact-form-status');
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.className = 'form-status-message ' + type;
+    statusEl.style.display = 'block';
+}
+
+// Отправка сообщения через Telegram
+async function sendContactMessage(name, email, subject, message) {
+    try {
+        const botToken = await getSetting('telegram_bot_token');
+        const chatId = await getSetting('telegram_chat_id');
+        const proxyUrl = await getSetting('telegram_proxy') || 'https://api.telegram.org';
+
+        if (!botToken || !chatId) {
+            console.log('🤖 Telegram не настроен');
+            return;
+        }
+
+        const text = `
+📩 НОВОЕ СООБЩЕНИЕ
+
+👤 Имя: ${name}
+📧 Email: ${email}
+📌 Тема: ${subject}
+
+${message}
+        `.trim();
+
+        const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: text,
+                parse_mode: 'Markdown',
+                disable_web_page_preview: true
+            })
+        });
+
+        const result = await response.json();
+        if (result.ok) {
+            console.log('✅ Сообщение отправлено в Telegram');
+        } else {
+            console.error('❌ Ошибка отправки в Telegram:', result);
+        }
+
+    } catch (error) {
+        console.error('❌ Ошибка отправки сообщения:', error);
+    }
+}
+
+// Добавляем getSetting в script.js (если её нет)
+async function getSetting(key) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', key)
+            .single();
+
+        if (error) return null;
+        return data ? data.value : null;
+    } catch {
+        return null;
+    }
+}
 // ============================================
 //  ПЛАВАЮЩИЕ ЧАСТИЦЫ
 // ============================================
