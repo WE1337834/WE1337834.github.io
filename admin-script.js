@@ -698,7 +698,8 @@ async function saveSettings(event) {
     const settingsData = {
         telegram_bot_token: document.getElementById('settings-telegram-bot').value.trim(),
         telegram_chat_id: document.getElementById('settings-telegram-chat').value.trim(),
-        site_url: document.getElementById('settings-site-url').value.trim()
+        site_url: document.getElementById('settings-site-url').value.trim(),
+        telegram_proxy: document.getElementById('settings-telegram-proxy')?.value.trim() || 'https://api.telegram.org'
     };
 
     try {
@@ -725,7 +726,7 @@ async function saveSettings(event) {
 }
 
 // ============================================
-//  TELEGRAM УВЕДОМЛЕНИЯ
+//  TELEGRAM УВЕДОМЛЕНИЯ (с поддержкой прокси)
 // ============================================
 
 async function getSetting(key) {
@@ -748,8 +749,12 @@ async function sendTelegramNotification(projectData, action = 'create') {
         const botToken = await getSetting('telegram_bot_token');
         const chatId = await getSetting('telegram_chat_id');
         const siteUrl = await getSetting('site_url') || window.location.origin;
+        const proxyUrl = await getSetting('telegram_proxy') || 'https://api.telegram.org';
 
-        if (!botToken || !chatId) return;
+        if (!botToken || !chatId) {
+            console.log('🤖 Telegram не настроен');
+            return;
+        }
 
         const actionText = action === 'create' ? '🆕 Добавлен новый проект' : '✏️ Обновлён проект';
         const statusEmoji = projectData.status === 'published' ? '✅' : projectData.status === 'draft' ? '🔄' : '📦';
@@ -771,7 +776,8 @@ ${tagsText}
 🔗 ${siteUrl}
         `.trim();
 
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        // Пробуем отправить через прокси
+        const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -782,8 +788,15 @@ ${tagsText}
             })
         });
 
+        const result = await response.json();
+        if (result.ok) {
+            console.log('✅ Уведомление отправлено');
+        } else {
+            console.error('❌ Ошибка отправки:', result);
+        }
+
     } catch (error) {
-        console.error('Ошибка отправки уведомления:', error);
+        console.error('❌ Ошибка отправки уведомления:', error);
     }
 }
 
@@ -796,6 +809,7 @@ async function sendTestNotification() {
     try {
         const botToken = await getSetting('telegram_bot_token');
         const chatId = await getSetting('telegram_chat_id');
+        const proxyUrl = await getSetting('telegram_proxy') || 'https://api.telegram.org';
 
         if (!botToken || !chatId) {
             statusEl.textContent = '❌ Настройте Telegram Bot Token и Chat ID в разделе "Настройки"';
@@ -803,12 +817,14 @@ async function sendTestNotification() {
             return;
         }
 
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        const message = '✅ Тестовое уведомление работает! 🎉\n\nВаше портфолио настроено правильно.';
+
+        const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: chatId,
-                text: '✅ Тестовое уведомление работает! 🎉\n\nВаше портфолио настроено правильно.',
+                text: message,
                 parse_mode: 'Markdown'
             })
         });
@@ -818,11 +834,12 @@ async function sendTestNotification() {
             statusEl.textContent = '✅ Уведомление успешно отправлено! Проверьте Telegram.';
             statusEl.className = 'form-status success';
         } else {
-            statusEl.textContent = `❌ Ошибка: ${result.description}`;
+            statusEl.textContent = `❌ Ошибка: ${result.description || 'Неизвестная ошибка'}`;
             statusEl.className = 'form-status error';
         }
 
     } catch (error) {
+        console.error('❌ Ошибка:', error);
         statusEl.textContent = `❌ Ошибка: ${error.message}`;
         statusEl.className = 'form-status error';
     }
