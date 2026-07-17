@@ -45,6 +45,7 @@
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
             <button class="tab-btn" data-tab="about">👤 Обо мне</button>
+            <button class="tab-btn" data-tab="messages">📩 Заявки</button>
             <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
             <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
             <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
@@ -192,6 +193,33 @@
             </div>
         </div>
 
+        <!-- ===== ВКЛАДКА: ЗАЯВКИ ===== -->
+        <div id="tab-messages" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📩 Все заявки</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span class="card-badge" id="messages-count">0</span>
+                        <button onclick="loadMessages()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px;">🔄 Обновить</button>
+                        <button onclick="exportMessages()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px;">📥 Экспорт</button>
+                    </div>
+                </div>
+                
+                <!-- Фильтры по статусам -->
+                <div class="message-filters">
+                    <button class="filter-btn active" data-status="all">📋 Все</button>
+                    <button class="filter-btn" data-status="new">🆕 Новые</button>
+                    <button class="filter-btn" data-status="read">📖 Прочитанные</button>
+                    <button class="filter-btn" data-status="replied">✉️ Отвеченные</button>
+                    <button class="filter-btn" data-status="archived">📦 Архив</button>
+                </div>
+                
+                <div id="messages-list" class="messages-list">
+                    <div class="empty-state"><p>📭 Загрузка заявок...</p></div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== ВКЛАДКА: АНАЛИТИКА ===== -->
         <div id="tab-analytics" class="tab-content">
             <div class="admin-card">
@@ -251,57 +279,60 @@
         </div>
 
         <!-- ===== ВКЛАДКА: НАСТРОЙКИ ===== -->
-<div id="tab-settings" class="tab-content">
-    <div class="admin-card">
-        <div class="admin-card-header">
-            <h2>⚙️ Настройки</h2>
+        <div id="tab-settings" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>⚙️ Настройки</h2>
+                </div>
+                <form id="settings-form" class="admin-form">
+                    <div class="form-group">
+                        <label for="settings-telegram-bot">🤖 Telegram Bot Token</label>
+                        <input type="text" id="settings-telegram-bot" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxyz">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Получить у <a href="https://t.me/botfather" target="_blank">@BotFather</a>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-telegram-chat">📨 Telegram Chat ID</label>
+                        <input type="text" id="settings-telegram-chat" placeholder="123456789">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Узнать у <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-telegram-proxy">🌐 Telegram API Proxy</label>
+                        <input type="url" id="settings-telegram-proxy" placeholder="https://api.telegram.org или прокси" value="https://api.telegram.org">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Если api.telegram.org заблокирован, используйте:<br>
+                            <code style="background: var(--bg-primary); padding: 2px 8px; border-radius: 4px; font-size: 12px;">https://tg-api-proxy.vercel.app</code>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-site-url">🌐 URL сайта</label>
+                        <input type="url" id="settings-site-url" placeholder="https://ваш-сайт.github.io">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Сохранить настройки</button>
+                    </div>
+                    <div id="settings-status" class="form-status"></div>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>📨 Тестовое уведомление</h2>
+                </div>
+                <div style="padding: 20px 28px;">
+                    <button onclick="sendTestNotification()" class="btn btn-primary">📨 Отправить тестовое уведомление</button>
+                    <div id="notification-status" class="form-status" style="margin-top: 12px;"></div>
+                </div>
+            </div>
         </div>
-        <form id="settings-form" class="admin-form">
-            <div class="form-group">
-                <label for="settings-telegram-bot">🤖 Telegram Bot Token</label>
-                <input type="text" id="settings-telegram-bot" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxyz">
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                    Получить у <a href="https://t.me/botfather" target="_blank">@BotFather</a>
-                </p>
-            </div>
-            <div class="form-group">
-                <label for="settings-telegram-chat">📨 Telegram Chat ID</label>
-                <input type="text" id="settings-telegram-chat" placeholder="123456789">
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                    Узнать у <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
-                </p>
-            </div>
-            <div class="form-group">
-                <label for="settings-telegram-proxy">🌐 Telegram API Proxy</label>
-                <input type="url" id="settings-telegram-proxy" placeholder="https://api.telegram.org или прокси" value="https://api.telegram.org">
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                    Если api.telegram.org заблокирован, используйте:<br>
-                    <code style="background: var(--bg-primary); padding: 2px 8px; border-radius: 4px; font-size: 12px;">https://tg-api-proxy.vercel.app</code>
-                </p>
-            </div>
-            <div class="form-group">
-                <label for="settings-site-url">🌐 URL сайта</label>
-                <input type="url" id="settings-site-url" placeholder="https://ваш-сайт.github.io">
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">💾 Сохранить настройки</button>
-            </div>
-            <div id="settings-status" class="form-status"></div>
-        </form>
+
     </div>
 
-    <div class="admin-card">
-        <div class="admin-card-header">
-            <h2>📨 Тестовое уведомление</h2>
-        </div>
-        <div style="padding: 20px 28px;">
-            <button onclick="sendTestNotification()" class="btn btn-primary">📨 Отправить тестовое уведомление</button>
-            <div id="notification-status" class="form-status" style="margin-top: 12px;"></div>
-        </div>
-    </div>
-</div>
-
-    </div>
+    <!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ЗАЯВОК ===== -->
+    <div id="message-modal" class="message-modal-overlay"></div>
 
     <!-- Lightbox для изображений -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">

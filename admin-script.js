@@ -5,6 +5,13 @@ let avatarFile = null;
 let currentAvatarUrl = '';
 
 // ============================================
+//  ЗАЯВКИ (ПЕРЕМЕННЫЕ)
+// ============================================
+
+let messagesData = [];
+let currentMessageStatus = 'all';
+
+// ============================================
 //  АВТОРИЗАЦИЯ
 // ============================================
 
@@ -22,6 +29,8 @@ function checkAuth() {
         loadContacts();
         loadSettings();
         loadAbout();
+        loadMessages();
+        initMessageFilters();
         initMarkdownEditor();
         initAvatarUpload();
     } else {
@@ -60,6 +69,7 @@ function initTabs() {
     const contents = {
         projects: document.getElementById('tab-projects'),
         about: document.getElementById('tab-about'),
+        messages: document.getElementById('tab-messages'),
         contacts: document.getElementById('tab-contacts'),
         settings: document.getElementById('tab-settings'),
         analytics: document.getElementById('tab-analytics')
@@ -80,6 +90,9 @@ function initTabs() {
                 }
                 if (tabName === 'about') {
                     loadAbout();
+                }
+                if (tabName === 'messages') {
+                    loadMessages();
                 }
             }
         });
@@ -589,6 +602,248 @@ function renderMarkdownPreview(text) {
 }
 
 // ============================================
+//  ЗАЯВКИ (CRUD) — С ФИЛЬТРАМИ
+// ============================================
+
+function initMessageFilters() {
+    const filters = document.querySelectorAll('.filter-btn');
+    filters.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filters.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentMessageStatus = this.dataset.status;
+            loadMessages();
+        });
+    });
+}
+
+async function loadMessages() {
+    const container = document.getElementById('messages-list');
+    const countBadge = document.getElementById('messages-count');
+    
+    if (!container) return;
+
+    try {
+        let query = supabaseClient
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (currentMessageStatus !== 'all') {
+            query = query.eq('status', currentMessageStatus);
+        }
+
+        const { data: messages, error } = await query;
+
+        if (error) throw error;
+
+        messagesData = messages || [];
+
+        if (countBadge) {
+            const unread = messagesData.filter(m => m.status === 'new').length;
+            const total = messagesData.length;
+            countBadge.textContent = unread > 0 ? `${total} (${unread} новых)` : total;
+        }
+
+        if (!messagesData || messagesData.length === 0) {
+            const statusLabels = {
+                all: 'заявок',
+                new: 'новых заявок',
+                read: 'прочитанных заявок',
+                replied: 'отвеченных заявок',
+                archived: 'заявок в архиве'
+            };
+            const label = statusLabels[currentMessageStatus] || 'заявок';
+            container.innerHTML = `<div class="empty-state"><p>📭 Нет ${label}</p></div>`;
+            return;
+        }
+
+        const statusLabelsMap = {
+            new: '🆕 Новый',
+            read: '📖 Прочитан',
+            replied: '✉️ Ответил',
+            archived: '📦 В архиве'
+        };
+
+        container.innerHTML = messagesData.map(msg => `
+            <div class="message-item" onclick="openMessageModal(${msg.id})">
+                <div class="message-info">
+                    <div class="message-header">
+                        <h4>${escapeHtml(msg.name)}</h4>
+                        <span class="message-email">${escapeHtml(msg.email)}</span>
+                        ${msg.subject && msg.subject !== 'Без темы' ? `<span class="message-subject">${escapeHtml(msg.subject)}</span>` : ''}
+                    </div>
+                    <div class="message-body">${escapeHtml(msg.message)}</div>
+                    <div class="message-meta">
+                        <span>${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
+                    </div>
+                </div>
+                <div class="message-actions">
+                    <span class="message-status ${msg.status}">${statusLabelsMap[msg.status] || msg.status}</span>
+                    <span class="message-date">${new Date(msg.created_at).toLocaleDateString('ru-RU')}</span>
+                    <div class="message-buttons" onclick="event.stopPropagation();">
+                        ${msg.status === 'new' ? `<button class="btn-mark-read" onclick="updateMessageStatus(${msg.id}, 'read')">📖 Прочитать</button>` : ''}
+                        ${msg.status !== 'replied' ? `<button class="btn-mark-replied" onclick="updateMessageStatus(${msg.id}, 'replied')">✉️ Ответил</button>` : ''}
+                        ${msg.status !== 'archived' ? `<button class="btn-archive" onclick="updateMessageStatus(${msg.id}, 'archived')">📦 В архив</button>` : ''}
+                        <button class="btn-delete" onclick="deleteMessage(${msg.id})">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Ошибка загрузки заявок:', error);
+        container.innerHTML = `<div class="empty-state"><p>⚠️ Ошибка: ${error.message}</p></div>`;
+    }
+}
+
+async function updateMessageStatus(id, status) {
+    try {
+        const { error } = await supabaseClient
+            .from('messages')
+            .update({ 
+                status: status,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        loadMessages();
+
+    } catch (error) {
+        console.error('Ошибка обновления статуса:', error);
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+async function deleteMessage(id) {
+    if (!confirm('⚠️ Вы уверены, что хотите удалить эту заявку?')) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('messages')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        loadMessages();
+
+    } catch (error) {
+        console.error('Ошибка удаления:', error);
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// ============================================
+//  МОДАЛЬНОЕ ОКНО ПРОСМОТРА ЗАЯВКИ
+// ============================================
+
+function openMessageModal(id) {
+    const msg = messagesData.find(m => m.id === id);
+    if (!msg) return;
+
+    const overlay = document.getElementById('message-modal');
+    if (!overlay) return;
+
+    const statusLabels = {
+        new: '🆕 Новый',
+        read: '📖 Прочитан',
+        replied: '✉️ Ответил',
+        archived: '📦 В архиве'
+    };
+
+    overlay.innerHTML = `
+        <div class="message-modal">
+            <div class="message-modal-header">
+                <h3>📩 Заявка от ${escapeHtml(msg.name)}</h3>
+                <button class="modal-close" onclick="closeMessageModal()">✕</button>
+            </div>
+            <div class="message-modal-body">
+                <div class="modal-field">
+                    <span class="field-label">👤 Имя</span>
+                    <span class="field-value">${escapeHtml(msg.name)}</span>
+                </div>
+                <div class="modal-field">
+                    <span class="field-label">📧 Email</span>
+                    <span class="field-value">${escapeHtml(msg.email)}</span>
+                </div>
+                ${msg.subject ? `
+                <div class="modal-field">
+                    <span class="field-label">📌 Тема</span>
+                    <span class="field-value">${escapeHtml(msg.subject)}</span>
+                </div>
+                ` : ''}
+                <div class="modal-field">
+                    <span class="field-label">💬 Сообщение</span>
+                    <div class="field-value message-text">${escapeHtml(msg.message)}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="field-label">📅 Дата</span>
+                    <span class="field-value">${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
+                </div>
+                <div class="modal-field">
+                    <span class="field-label">📊 Статус</span>
+                    <span class="field-value"><span class="message-status ${msg.status}">${statusLabels[msg.status] || msg.status}</span></span>
+                </div>
+            </div>
+            <div class="message-modal-footer">
+                ${msg.status === 'new' ? `<button class="btn-mark-read" onclick="updateMessageStatus(${msg.id}, 'read'); closeMessageModal();">📖 Отметить прочитанным</button>` : ''}
+                ${msg.status !== 'replied' ? `<button class="btn-mark-replied" onclick="updateMessageStatus(${msg.id}, 'replied'); closeMessageModal();">✉️ Отметить отвеченным</button>` : ''}
+                ${msg.status !== 'archived' ? `<button class="btn-archive" onclick="updateMessageStatus(${msg.id}, 'archived'); closeMessageModal();">📦 В архив</button>` : ''}
+                <button class="btn-delete" onclick="deleteMessage(${msg.id}); closeMessageModal();">🗑️ Удалить</button>
+                <button onclick="closeMessageModal()" style="background: var(--bg-primary); color: var(--text-primary); margin-left: auto;">Закрыть</button>
+            </div>
+        </div>
+    `;
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMessageModal() {
+    const overlay = document.getElementById('message-modal');
+    if (overlay) {
+        overlay.classList.remove('active');
+        overlay.innerHTML = '';
+    }
+    document.body.style.overflow = '';
+}
+
+// ============================================
+//  ЭКСПОРТ ЗАЯВОК В CSV
+// ============================================
+
+function exportMessages() {
+    if (!messagesData || messagesData.length === 0) {
+        alert('📭 Нет заявок для экспорта');
+        return;
+    }
+
+    const headers = ['ID', 'Имя', 'Email', 'Тема', 'Сообщение', 'Статус', 'Дата'];
+    const rows = messagesData.map(msg => [
+        msg.id,
+        `"${msg.name}"`,
+        `"${msg.email}"`,
+        `"${msg.subject || 'Без темы'}"`,
+        `"${msg.message.replace(/"/g, '""')}"`,
+        msg.status,
+        new Date(msg.created_at).toLocaleString('ru-RU')
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `заявки_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ============================================
 //  КОНТАКТЫ
 // ============================================
 
@@ -698,8 +953,8 @@ async function saveSettings(event) {
     const settingsData = {
         telegram_bot_token: document.getElementById('settings-telegram-bot').value.trim(),
         telegram_chat_id: document.getElementById('settings-telegram-chat').value.trim(),
-        site_url: document.getElementById('settings-site-url').value.trim(),
-        telegram_proxy: document.getElementById('settings-telegram-proxy')?.value.trim() || 'https://api.telegram.org'
+        telegram_proxy: document.getElementById('settings-telegram-proxy')?.value.trim() || 'https://api.telegram.org',
+        site_url: document.getElementById('settings-site-url').value.trim()
     };
 
     try {
@@ -726,7 +981,7 @@ async function saveSettings(event) {
 }
 
 // ============================================
-//  TELEGRAM УВЕДОМЛЕНИЯ (с поддержкой прокси)
+//  TELEGRAM УВЕДОМЛЕНИЯ
 // ============================================
 
 async function getSetting(key) {
@@ -776,7 +1031,6 @@ ${tagsText}
 🔗 ${siteUrl}
         `.trim();
 
-        // Пробуем отправить через прокси
         const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

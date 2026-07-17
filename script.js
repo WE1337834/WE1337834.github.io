@@ -664,6 +664,9 @@ async function loadContacts() {
 // ============================================
 //  ФОРМА СВЯЗИ (ОБНОВЛЁННАЯ)
 // ============================================
+// ============================================
+//  ФОРМА СВЯЗИ (С СОХРАНЕНИЕМ В БД)
+// ============================================
 
 function initContactForm() {
     const form = document.getElementById('contact-form');
@@ -675,12 +678,12 @@ function initContactForm() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Получаем данные из полей
         const nameInput = document.getElementById('contact-name');
         const emailInput = document.getElementById('contact-email-input');
         const subjectInput = document.getElementById('contact-subject');
         const messageInput = document.getElementById('contact-message');
         const statusEl = document.getElementById('contact-form-status');
+        const submitBtn = form.querySelector('.btn-submit');
         
         const name = nameInput ? nameInput.value.trim() : '';
         const email = emailInput ? emailInput.value.trim() : '';
@@ -698,33 +701,126 @@ function initContactForm() {
             return;
         }
 
-        // Формируем сообщение
-        const fullMessage = `
-📝 Сообщение от ${name}
+        // Блокируем кнопку
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Отправка...';
 
-📧 Email: ${email}
-📌 Тема: ${subject}
+        // Сохраняем заявку
+        saveMessage(name, email, subject, message)
+            .then(() => {
+                showFormStatus(`✅ Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`, 'success');
+                form.reset();
+                
+                // Отправляем уведомление в Telegram
+                sendTelegramNotification({
+                    name: name,
+                    email: email,
+                    subject: subject,
+                    message: message
+                });
+            })
+            .catch((error) => {
+                console.error('❌ Ошибка сохранения:', error);
+                showFormStatus('❌ Ошибка отправки. Попробуйте позже.', 'error');
+            })
+            .finally(() => {
+                // Разблокируем кнопку
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <span>🚀 Отправить сообщение</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                `;
 
-💬 Сообщение:
-${message}
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    const el = document.getElementById('contact-form-status');
+                    if (el) {
+                        el.style.display = 'none';
+                        el.className = 'form-status-message';
+                    }
+                }, 5000);
+            });
+    });
+}
+
+// ============================================
+//  СОХРАНЕНИЕ СООБЩЕНИЯ В БД
+// ============================================
+
+async function saveMessage(name, email, subject, message) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('messages')
+            .insert([{
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                status: 'new'
+            }]);
+
+        if (error) throw error;
+        console.log('✅ Сообщение сохранено в БД');
+        return data;
+
+    } catch (error) {
+        console.error('❌ Ошибка сохранения сообщения:', error);
+        throw error;
+    }
+}
+
+// ============================================
+//  ОТПРАВКА УВЕДОМЛЕНИЯ В TELEGRAM
+// ============================================
+
+async function sendTelegramNotification(data) {
+    try {
+        const botToken = await getSetting('telegram_bot_token');
+        const chatId = await getSetting('telegram_chat_id');
+        const proxyUrl = await getSetting('telegram_proxy') || 'https://api.telegram.org';
+
+        if (!botToken || !chatId) {
+            console.log('🤖 Telegram не настроен');
+            return;
+        }
+
+        const text = `
+📩 **НОВАЯ ЗАЯВКА** 🔔
+
+👤 **Имя:** ${data.name}
+📧 **Email:** ${data.email}
+📌 **Тема:** ${data.subject}
+
+💬 **Сообщение:**
+${data.message}
+
+📅 ${new Date().toLocaleString('ru-RU')}
         `.trim();
 
-        // Отправляем через EmailJS или Telegram (здесь используется Telegram)
-        sendContactMessage(name, email, subject, fullMessage);
+        const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: text,
+                parse_mode: 'Markdown',
+                disable_web_page_preview: true
+            })
+        });
 
-        // Показываем успех
-        showFormStatus(`✅ Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`, 'success');
-        form.reset();
+        const result = await response.json();
+        if (result.ok) {
+            console.log('✅ Уведомление отправлено в Telegram');
+        } else {
+            console.error('❌ Ошибка отправки в Telegram:', result);
+        }
 
-        // Скрываем сообщение через 5 секунд
-        setTimeout(() => {
-            const el = document.getElementById('contact-form-status');
-            if (el) {
-                el.style.display = 'none';
-                el.className = 'form-status-message';
-            }
-        }, 5000);
-    });
+    } catch (error) {
+        console.error('❌ Ошибка отправки уведомления:', error);
+    }
 }
 
 // Валидация email
@@ -742,6 +838,35 @@ function showFormStatus(message, type = 'success') {
     statusEl.style.display = 'block';
 }
 
+// getSetting уже есть в admin-script.js, но добавим в script.js
+async function getSetting(key) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', key)
+            .single();
+
+        if (error) return null;
+        return data ? data.value : null;
+    } catch {
+        return null;
+    }
+}
+async function getSetting(key) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', key)
+            .single();
+
+        if (error) return null;
+        return data ? data.value : null;
+    } catch {
+        return null;
+    }
+}
 // Отправка сообщения через Telegram
 async function sendContactMessage(name, email, subject, message) {
     try {
@@ -788,20 +913,7 @@ ${message}
 }
 
 // Добавляем getSetting в script.js (если её нет)
-async function getSetting(key) {
-    try {
-        const { data, error } = await supabaseClient
-            .from('settings')
-            .select('value')
-            .eq('key', key)
-            .single();
 
-        if (error) return null;
-        return data ? data.value : null;
-    } catch {
-        return null;
-    }
-}
 // ============================================
 //  ПЛАВАЮЩИЕ ЧАСТИЦЫ
 // ============================================
