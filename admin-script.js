@@ -12,6 +12,13 @@ let messagesData = [];
 let currentMessageStatus = 'all';
 
 // ============================================
+//  БОТ-ЗАЯВКИ (ПЕРЕМЕННЫЕ)
+// ============================================
+
+let botMessagesData = [];
+let currentBotMessageStatus = 'all';
+
+// ============================================
 //  АВТОРИЗАЦИЯ
 // ============================================
 
@@ -31,6 +38,8 @@ function checkAuth() {
         loadAbout();
         loadMessages();
         initMessageFilters();
+        loadBotMessages();
+        initBotMessageFilters();
         initMarkdownEditor();
         initAvatarUpload();
     } else {
@@ -72,7 +81,8 @@ function initTabs() {
         messages: document.getElementById('tab-messages'),
         contacts: document.getElementById('tab-contacts'),
         settings: document.getElementById('tab-settings'),
-        analytics: document.getElementById('tab-analytics')
+        analytics: document.getElementById('tab-analytics'),
+        botMessages: document.getElementById('tab-bot-messages')
     };
 
     tabs.forEach(tab => {
@@ -93,6 +103,9 @@ function initTabs() {
                 }
                 if (tabName === 'messages') {
                     loadMessages();
+                }
+                if (tabName === 'botMessages') {
+                    loadBotMessages();
                 }
             }
         });
@@ -708,7 +721,6 @@ async function updateMessageStatus(id, status) {
             .eq('id', id);
 
         if (error) throw error;
-
         loadMessages();
 
     } catch (error) {
@@ -727,7 +739,6 @@ async function deleteMessage(id) {
             .eq('id', id);
 
         if (error) throw error;
-
         loadMessages();
 
     } catch (error) {
@@ -1188,6 +1199,335 @@ async function loadAnalytics() {
 }
 
 // ============================================
+//  БОТ-ЗАЯВКИ (CRUD) + ОТВЕТЫ
+// ============================================
+
+function initBotMessageFilters() {
+    const filters = document.querySelectorAll('[data-bot-status]');
+    filters.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filters.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentBotMessageStatus = this.dataset.botStatus;
+            loadBotMessages();
+        });
+    });
+}
+
+async function loadBotMessages() {
+    const container = document.getElementById('bot-messages-list');
+    const countBadge = document.getElementById('bot-messages-count');
+    
+    if (!container) return;
+
+    try {
+        let query = supabaseClient
+            .from('bot_messages')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (currentBotMessageStatus !== 'all') {
+            query = query.eq('status', currentBotMessageStatus);
+        }
+
+        const { data: messages, error } = await query;
+
+        if (error) throw error;
+
+        botMessagesData = messages || [];
+
+        if (countBadge) {
+            const unread = botMessagesData.filter(m => m.status === 'new').length;
+            const total = botMessagesData.length;
+            countBadge.textContent = unread > 0 ? `${total} (${unread} новых)` : total;
+        }
+
+        if (!botMessagesData || botMessagesData.length === 0) {
+            const statusLabels = {
+                all: 'заявок из бота',
+                new: 'новых заявок из бота',
+                read: 'прочитанных заявок из бота',
+                replied: 'отвеченных заявок из бота',
+                archived: 'заявок из бота в архиве'
+            };
+            const label = statusLabels[currentBotMessageStatus] || 'заявок из бота';
+            container.innerHTML = `<div class="empty-state"><p>🤖 Нет ${label}</p></div>`;
+            return;
+        }
+
+        const statusLabelsMap = {
+            new: '🆕 Новый',
+            read: '📖 Прочитан',
+            replied: '✉️ Отвечен',
+            archived: '📦 В архиве'
+        };
+
+        container.innerHTML = botMessagesData.map(msg => `
+            <div class="message-item" onclick="openBotMessageModal(${msg.id})">
+                <div class="message-info">
+                    <div class="message-header">
+                        <h4>${escapeHtml(msg.first_name || 'Пользователь')} ${escapeHtml(msg.last_name || '')}</h4>
+                        ${msg.username ? `<span class="message-email">@${escapeHtml(msg.username)}</span>` : ''}
+                        <span class="message-subject">🆔 ${escapeHtml(msg.user_id)}</span>
+                    </div>
+                    <div class="message-body">${escapeHtml(msg.message)}</div>
+                    ${msg.admin_reply ? `<div style="background: rgba(52,199,89,0.08); padding: 8px 12px; border-radius: 8px; margin: 4px 0; font-size: 0.85rem; color: #34c759;"><strong>✉️ Ответ:</strong> ${escapeHtml(msg.admin_reply)}</div>` : ''}
+                    <div class="message-meta">
+                        <span>${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
+                    </div>
+                </div>
+                <div class="message-actions">
+                    <span class="message-status ${msg.status}">${statusLabelsMap[msg.status] || msg.status}</span>
+                    <span class="message-date">${new Date(msg.created_at).toLocaleDateString('ru-RU')}</span>
+                    <div class="message-buttons" onclick="event.stopPropagation();">
+                        ${msg.status === 'new' ? `<button class="btn-mark-read" onclick="updateBotMessageStatus(${msg.id}, 'read')">📖 Прочитать</button>` : ''}
+                        ${msg.status !== 'replied' ? `<button class="btn-mark-replied" onclick="openReplyForm(${msg.id})">✉️ Ответить</button>` : ''}
+                        ${msg.status !== 'archived' ? `<button class="btn-archive" onclick="updateBotMessageStatus(${msg.id}, 'archived')">📦 В архив</button>` : ''}
+                        <button class="btn-delete" onclick="deleteBotMessage(${msg.id})">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Ошибка загрузки бот-заявок:', error);
+        container.innerHTML = `<div class="empty-state"><p>⚠️ Ошибка: ${error.message}</p></div>`;
+    }
+}
+
+async function updateBotMessageStatus(id, status) {
+    try {
+        const { error } = await supabaseClient
+            .from('bot_messages')
+            .update({ 
+                status: status,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
+
+        if (error) throw error;
+        loadBotMessages();
+
+    } catch (error) {
+        console.error('Ошибка обновления статуса:', error);
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+async function deleteBotMessage(id) {
+    if (!confirm('⚠️ Вы уверены, что хотите удалить эту заявку из бота?')) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('bot_messages')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        loadBotMessages();
+
+    } catch (error) {
+        console.error('Ошибка удаления:', error);
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// ============================================
+//  МОДАЛЬНОЕ ОКНО ПРОСМОТРА БОТ-ЗАЯВКИ
+// ============================================
+
+function openBotMessageModal(id) {
+    const msg = botMessagesData.find(m => m.id === id);
+    if (!msg) return;
+
+    const overlay = document.getElementById('bot-message-modal');
+    if (!overlay) return;
+
+    const statusLabels = {
+        new: '🆕 Новый',
+        read: '📖 Прочитан',
+        replied: '✉️ Отвечен',
+        archived: '📦 В архиве'
+    };
+
+    const userInfo = msg.username ? `@${msg.username}` : `${msg.first_name || 'Пользователь'} ${msg.last_name || ''}`.trim() || msg.user_id;
+
+    overlay.innerHTML = `
+        <div class="message-modal">
+            <div class="message-modal-header">
+                <h3>🤖 Заявка из бота</h3>
+                <button class="modal-close" onclick="closeBotMessageModal()">✕</button>
+            </div>
+            <div class="message-modal-body">
+                <div class="modal-field">
+                    <span class="field-label">👤 Пользователь</span>
+                    <span class="field-value">${escapeHtml(userInfo)}</span>
+                </div>
+                <div class="modal-field">
+                    <span class="field-label">🆔 User ID</span>
+                    <span class="field-value">${escapeHtml(msg.user_id)}</span>
+                </div>
+                ${msg.username ? `
+                <div class="modal-field">
+                    <span class="field-label">🔹 Username</span>
+                    <span class="field-value">@${escapeHtml(msg.username)}</span>
+                </div>
+                ` : ''}
+                <div class="modal-field">
+                    <span class="field-label">💬 Сообщение</span>
+                    <div class="field-value message-text">${escapeHtml(msg.message)}</div>
+                </div>
+                ${msg.admin_reply ? `
+                <div class="modal-field">
+                    <span class="field-label">✉️ Ответ администратора</span>
+                    <div class="field-value message-text" style="background: rgba(52,199,89,0.05); border: 1px solid rgba(52,199,89,0.1);">${escapeHtml(msg.admin_reply)}</div>
+                </div>
+                ` : ''}
+                <div class="modal-field">
+                    <span class="field-label">📅 Дата</span>
+                    <span class="field-value">${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
+                </div>
+                <div class="modal-field">
+                    <span class="field-label">📊 Статус</span>
+                    <span class="field-value"><span class="message-status ${msg.status}">${statusLabels[msg.status] || msg.status}</span></span>
+                </div>
+            </div>
+            <div class="message-modal-footer">
+                ${msg.status === 'new' ? `<button class="btn-mark-read" onclick="updateBotMessageStatus(${msg.id}, 'read'); closeBotMessageModal();">📖 Отметить прочитанным</button>` : ''}
+                ${msg.status !== 'replied' ? `<button class="btn-mark-replied" onclick="openReplyForm(${msg.id}); closeBotMessageModal();">✉️ Ответить</button>` : ''}
+                ${msg.status !== 'archived' ? `<button class="btn-archive" onclick="updateBotMessageStatus(${msg.id}, 'archived'); closeBotMessageModal();">📦 В архив</button>` : ''}
+                <button class="btn-delete" onclick="deleteBotMessage(${msg.id}); closeBotMessageModal();">🗑️ Удалить</button>
+                <button onclick="closeBotMessageModal()" style="background: var(--bg-primary); color: var(--text-primary); margin-left: auto;">Закрыть</button>
+            </div>
+        </div>
+    `;
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBotMessageModal() {
+    const overlay = document.getElementById('bot-message-modal');
+    if (overlay) {
+        overlay.classList.remove('active');
+        overlay.innerHTML = '';
+    }
+    document.body.style.overflow = '';
+}
+
+// ============================================
+//  ОТВЕТ ПОЛЬЗОВАТЕЛЮ ИЗ БОТА
+// ============================================
+
+function openReplyForm(messageId) {
+    const msg = botMessagesData.find(m => m.id === messageId);
+    if (!msg) return;
+
+    const card = document.getElementById('reply-card');
+    const userInfo = document.getElementById('reply-user-info');
+    const userMessage = document.getElementById('reply-user-message');
+    const messageIdInput = document.getElementById('reply-message-id');
+    const replyText = document.getElementById('reply-text');
+
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    const userName = msg.first_name || 'Пользователь';
+    const userIdent = msg.username ? `@${msg.username}` : `ID: ${msg.user_id}`;
+    userInfo.textContent = `${userName} (${userIdent})`;
+    userMessage.textContent = msg.message;
+    messageIdInput.value = messageId;
+    replyText.value = '';
+    replyText.focus();
+
+    document.getElementById('reply-status').style.display = 'none';
+}
+
+function closeReplyForm() {
+    document.getElementById('reply-card').style.display = 'none';
+    document.getElementById('reply-text').value = '';
+    document.getElementById('reply-message-id').value = '';
+    document.getElementById('reply-status').style.display = 'none';
+}
+
+async function sendReply(event) {
+    event.preventDefault();
+    
+    const messageId = document.getElementById('reply-message-id').value;
+    const replyText = document.getElementById('reply-text').value.trim();
+    const statusEl = document.getElementById('reply-status');
+    const submitBtn = document.querySelector('#reply-form button[type="submit"]');
+
+    if (!replyText) {
+        showStatus('Пожалуйста, напишите ответ', 'error', 'reply-status');
+        return;
+    }
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Отправка...';
+
+        const { data: msg, error: getError } = await supabaseClient
+            .from('bot_messages')
+            .select('*')
+            .eq('id', messageId)
+            .single();
+
+        if (getError) throw getError;
+
+        const botToken = await getSetting('telegram_bot_token');
+        const proxyUrl = await getSetting('telegram_proxy') || 'https://api.telegram.org';
+
+        if (!botToken) {
+            showStatus('❌ Telegram Bot Token не настроен', 'error', 'reply-status');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📨 Отправить ответ';
+            return;
+        }
+
+        const response = await fetch(`${proxyUrl}/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: msg.user_id,
+                text: `📩 **Ответ от поддержки:**\n\n${replyText}`,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.ok) {
+            throw new Error(result.description || 'Ошибка отправки');
+        }
+
+        await supabaseClient
+            .from('bot_messages')
+            .update({
+                admin_reply: replyText,
+                status: 'replied',
+                replied_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', messageId);
+
+        showStatus('✅ Ответ успешно отправлен пользователю!', 'success', 'reply-status');
+        loadBotMessages();
+
+        setTimeout(() => {
+            closeReplyForm();
+        }, 2000);
+
+    } catch (error) {
+        console.error('❌ Ошибка отправки ответа:', error);
+        showStatus(`❌ Ошибка: ${error.message}`, 'error', 'reply-status');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '📨 Отправить ответ';
+    }
+}
+
+// ============================================
 //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // ============================================
 
@@ -1239,6 +1579,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('contacts-form')?.addEventListener('submit', saveContacts);
     document.getElementById('settings-form')?.addEventListener('submit', saveSettings);
     document.getElementById('about-form')?.addEventListener('submit', saveAbout);
+    document.getElementById('reply-form')?.addEventListener('submit', sendReply);
     initTabs();
     checkAuth();
 });

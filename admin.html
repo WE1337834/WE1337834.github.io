@@ -42,10 +42,12 @@
             </div>
         </header>
 
+        <!-- ===== ВКЛАДКИ ===== -->
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="projects">📁 Проекты</button>
             <button class="tab-btn" data-tab="about">👤 Обо мне</button>
             <button class="tab-btn" data-tab="messages">📩 Заявки</button>
+            <button class="tab-btn" data-tab="bot-messages">🤖 Бот</button>
             <button class="tab-btn" data-tab="analytics">📊 Аналитика</button>
             <button class="tab-btn" data-tab="contacts">📞 Контакты</button>
             <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
@@ -205,7 +207,6 @@
                     </div>
                 </div>
                 
-                <!-- Фильтры по статусам -->
                 <div class="message-filters">
                     <button class="filter-btn active" data-status="all">📋 Все</button>
                     <button class="filter-btn" data-status="new">🆕 Новые</button>
@@ -217,6 +218,55 @@
                 <div id="messages-list" class="messages-list">
                     <div class="empty-state"><p>📭 Загрузка заявок...</p></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ===== ВКЛАДКА: БОТ-ЗАЯВКИ ===== -->
+        <div id="tab-bot-messages" class="tab-content">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>🤖 Заявки из бота</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span class="card-badge" id="bot-messages-count">0</span>
+                        <button onclick="loadBotMessages()" class="btn btn-ghost" style="padding: 4px 12px; font-size: 12px;">🔄 Обновить</button>
+                    </div>
+                </div>
+                
+                <div class="message-filters">
+                    <button class="filter-btn active" data-bot-status="all">📋 Все</button>
+                    <button class="filter-btn" data-bot-status="new">🆕 Новые</button>
+                    <button class="filter-btn" data-bot-status="read">📖 Прочитанные</button>
+                    <button class="filter-btn" data-bot-status="replied">✉️ Отвеченные</button>
+                    <button class="filter-btn" data-bot-status="archived">📦 Архив</button>
+                </div>
+                
+                <div id="bot-messages-list" class="messages-list">
+                    <div class="empty-state"><p>🤖 Загрузка заявок из бота...</p></div>
+                </div>
+            </div>
+
+            <!-- ===== ФОРМА ОТВЕТА ===== -->
+            <div class="admin-card" id="reply-card" style="display: none;">
+                <div class="admin-card-header">
+                    <h2>✉️ Ответ пользователю</h2>
+                    <span class="card-badge" id="reply-user-info">Пользователь</span>
+                </div>
+                <form id="reply-form" class="admin-form">
+                    <div class="form-group">
+                        <label>💬 Сообщение пользователя</label>
+                        <div id="reply-user-message" style="background: var(--bg-primary); padding: 12px 16px; border-radius: var(--radius-sm); color: var(--text-secondary); line-height: 1.6;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reply-text">✏️ Ваш ответ</label>
+                        <textarea id="reply-text" rows="5" placeholder="Напишите ответ пользователю..." required></textarea>
+                    </div>
+                    <input type="hidden" id="reply-message-id">
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">📨 Отправить ответ</button>
+                        <button type="button" onclick="closeReplyForm()" class="btn btn-ghost">Отмена</button>
+                    </div>
+                    <div id="reply-status" class="form-status"></div>
+                </form>
             </div>
         </div>
 
@@ -331,8 +381,9 @@
 
     </div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ДЛЯ ЗАЯВОК ===== -->
+    <!-- ===== МОДАЛЬНЫЕ ОКНА ===== -->
     <div id="message-modal" class="message-modal-overlay"></div>
+    <div id="bot-message-modal" class="message-modal-overlay"></div>
 
     <!-- Lightbox для изображений -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">

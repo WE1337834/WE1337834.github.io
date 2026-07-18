@@ -98,14 +98,16 @@ async function loadProjects() {
     if (!container) return;
 
     try {
+        // Загружаем все проекты (без фильтра по статусу)
         let query = supabaseClient
             .from('projects')
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (!isAdminMode()) {
-            query = query.eq('status', 'published');
-        }
+        // ⬅️ УБИРАЕМ ФИЛЬТР ПО СТАТУСУ
+        // if (!isAdminMode()) {
+        //     query = query.eq('status', 'published');
+        // }
 
         const { data: projects, error } = await query;
 
@@ -113,10 +115,12 @@ async function loadProjects() {
 
         allProjects = projects || [];
         
-        updateStats(allProjects);
+        // Считаем только опубликованные для статистики
+        const publishedProjects = allProjects.filter(p => p.status === 'published');
+        updateStats(publishedProjects);
 
         if (subtitle) {
-            const count = allProjects.filter(p => p.status === 'published').length;
+            const count = allProjects.length;
             subtitle.textContent = count > 0 
                 ? `${count} проектов в портфолио` 
                 : 'Проектов пока нет';
@@ -387,7 +391,8 @@ function updateStats(projects) {
         return;
     }
 
-    const published = projects.filter(p => p.status === 'published').length;
+    // Считаем ВСЕ проекты (не только опубликованные)
+    const total = projects.length;
     const totalViews = projects.reduce((sum, p) => sum + (p.views || 0), 0);
 
     const statElements = statsContainer.querySelectorAll('.project-stat');
@@ -396,12 +401,12 @@ function updateStats(projects) {
         const numbers = statElements[0].querySelector('.number');
         const viewsNum = statElements[1].querySelector('.number');
         
-        if (numbers) numbers.textContent = published;
+        if (numbers) numbers.textContent = total;
         if (viewsNum) viewsNum.textContent = totalViews;
     } else {
         statsContainer.innerHTML = `
             <div class="project-stat">
-                <span class="number">${published}</span>
+                <span class="number">${total}</span>
                 <span class="label">Проектов</span>
             </div>
             <div class="project-stat">
